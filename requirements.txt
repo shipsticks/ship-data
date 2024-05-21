@@ -1,0 +1,7 @@
+pandas
+pandas-gbq
+tqdm
+google-cloud-bigquery
+google-api-python-client
+requests
+loguru

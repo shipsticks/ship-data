@@ -1,31 +1,40 @@
 # ship-data
 GSE data-platform
 
-Data wharehouse transformation orchestration service on GCP cloud run.
+Data warehouse transform orchestration service.
 
 ### Local Dev Setup
 
-    pip install requirements.txt
-    python main.py
+Install dependencies
+```
+pip install requirements.txt
+```
 
+Run workflow locally
+```
+python main.py
+```
 ### Deploy
-
-    gcloud run jobs deploy job-quickstart \
-	    --source . \
-	    --set-env-vars LOG_LEVEL=DEBUG \
-	    --max-retries 5 \
-	    --region REGION \
-	    --project=PROJECT_ID
+```
+gcloud run jobs deploy daily-tables \
+    --source . \
+    --set-env-vars LOG_LEVEL=DEBUG \
+    --max-retries 0 \
+    --region us-east1 \
+    --project gse-dw-prod
+```
 
 ### Execute Job Manually
-
-    gcloud run jobs execute job-quickstart --region REGION
+```
+gcloud run jobs execute daily-tables --region us-east1
+```
 
 ### Schedule Job
-
-    gcloud scheduler jobs create http SCHEDULER_JOB_NAME \
-	    --location SCHEDULER_REGION  \  
-	    --schedule="SCHEDULE"  \  
-	    --uri="https://CLOUD_RUN_REGION-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/PROJECT-ID/jobs/JOB-NAME:run"  \  
-	    --http-method POST \  
-	    --oauth-service-account-email PROJECT-NUMBER-compute@developer.gserviceaccount.com
+```
+gcloud scheduler jobs create http daily-tables-schedule \
+    --location us-east1  \
+    --schedule="0 12 * * *"  \
+    --uri="https://us-east1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/gse-dw-prod/jobs/daily-tables:run"  \
+    --http-method POST \
+    --oauth-service-account-email 493461219675-compute@developer.gserviceaccount.com
+```

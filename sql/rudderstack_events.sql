@@ -175,3 +175,10 @@ where
   domain not in ('ledgesvacationrentals.com', 'rtcc.net')
   and timestamp >= '2024-04-09'
 ;
+
+
+drop table if exists dp_bi.rudderstack_events;
+create table if not exists dp_bi.rudderstack_events as
+select *
+from dp_staging.meta_events
+;

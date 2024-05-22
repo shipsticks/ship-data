@@ -103,3 +103,10 @@ select
 from source_spend
 order by 1 desc, 2, 3, 4, 5, 6
 ;
+
+
+drop table if exists dp_bi.ad_spend;
+create table if not exists dp_bi.ad_spend as
+select *
+from dp_staging.source_spend
+;

@@ -101,7 +101,10 @@ create table if not exists dp_staging.att_2 as
 select
   e.anonymous_id
   , s.brand
+  , e.channel
   , e.source
+  , e.utm_medium
+  , e.utm_source
   , e.utm_campaign
   , e.domain || e.url_path as landing_page
   , min(e.timestamp) as attrabtion_at
@@ -120,7 +123,10 @@ union all
 select
   e.anonymous_id
   , s.brand
+  , e.channel
   , e.source
+  , e.utm_medium
+  , e.utm_source
   , e.utm_campaign
   , e.domain || e.url_path as landing_page
   , min(e.timestamp) as attrabtion_at
@@ -142,7 +148,10 @@ select
   s.anonymous_id
   , s.brand
   , coalesce(a.attrabtion_at, s.first_event_at) as attrabtion_at
+  , coalesce(a.channel, 'Organic') as channel
   , coalesce(a.source, 'Organic') as source
+  , a.utm_medium
+  , a.utm_source
   , a.utm_campaign
   , a.landing_page
 from dp_staging.att_1 as s
@@ -158,7 +167,10 @@ create table if not exists dp_staging.att_4 as
 select 
   a.*
   , b.attrabtion_at
+  , b.channel
   , b.source
+  , b.utm_medium
+  , b.utm_source
   , b.utm_campaign
   , b.landing_page
 from dp_staging.att_1 as a
@@ -182,6 +194,7 @@ join dp_staging.att_3 as b
 -- where user_id is not null
 -- qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
 -- ;
+
 
 -- dedup users with multiple anonymous_ids, use first non-organic anon if present.
 drop table if exists dp_staging.att_5;
@@ -227,7 +240,10 @@ select
   , coalesce(p.user_conversion_type, a.user_conversion_type) as user_conversion_type
   , coalesce(p.user_type, a.user_type) as user_type
   , coalesce(p.attrabtion_at, a.attrabtion_at) as attrabtion_at
+  , coalesce(p.channel, a.channel) as channel
   , coalesce(p.source, a.source) as source
+  , coalesce(p.utm_medium, a.utm_medium) as utm_medium
+  , coalesce(p.utm_source, a.utm_source) as utm_source
   , coalesce(p.utm_campaign, a.utm_campaign) as utm_campaign
   , coalesce(p.landing_page, a.landing_page) as landing_page
 from all_anons as a

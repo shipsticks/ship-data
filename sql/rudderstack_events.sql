@@ -9,20 +9,21 @@
 
 
 -- union rudderstack track+page events. classify utm parameters
-drop table if exists dp_staging.meta_events;
-create table if not exists dp_staging.meta_events as
+drop table if exists dp_bi.rudderstack_events;
+create table if not exists dp_bi.rudderstack_events as
 with events as (
 select
   id 
   , timestamp
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
+  , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
   , anonymous_id
   , user_id
   , 'pageview' as event
   , cast(null as numeric) as revenue
   , cast(null as string) as user_email
-  , context_page_path as url_path
+  -- , context_page_path as url_path
   , referring_domain
   , context_campaign_medium as utm_medium
   , context_campaign_source as utm_source
@@ -40,12 +41,13 @@ select
   , timestamp
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
+  , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
   , anonymous_id
   , user_id
   , event
   , cast(null as numeric) as revenue
   , cast(null as string) as user_email
-  , context_page_path as url_path
+  -- , context_page_path as url_path
   , cast(null as string) as referring_domain
   , context_campaign_medium as utm_medium
   , context_campaign_source as utm_source
@@ -64,12 +66,13 @@ select
   , timestamp
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
+  , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
   , anonymous_id
   , coalesce(user_id, ecommerce_purchase_action_field_user_id) as user_id
   , 'purchase' as event
   , cast(ecommerce_purchase_action_field_revenue as numeric) as revenue
   , cast(null as string) as user_email
-  , context_page_path as url_path
+  -- , context_page_path as url_path
   , cast(null as string) as referring_domain
   , cast(null as string) as utm_medium
   , cast(null as string) as utm_source
@@ -87,12 +90,13 @@ select
   , timestamp
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
+  , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
   , anonymous_id
   , user_id
   , 'generate_lead' as event
   , cast(null as numeric) as revenue
   , user_email
-  , context_page_path as url_path
+  -- , context_page_path as url_path
   , cast(null as string) as referring_domain
   , cast(null as string) as utm_medium
   , cast(null as string) as utm_source
@@ -174,11 +178,4 @@ from events
 where 
   domain not in ('ledgesvacationrentals.com', 'rtcc.net')
   and timestamp >= '2024-04-09'
-;
-
-
-drop table if exists dp_bi.rudderstack_events;
-create table if not exists dp_bi.rudderstack_events as
-select *
-from dp_staging.meta_events
 ;

@@ -18,6 +18,18 @@ select
 from dp_staging.source_spend
 where spend_date >= '2024-04-09'
 group by all
+), site_visits as (
+select
+  brand
+  , date(timestamp) as event_date
+  , source
+  , utm_campaign as campaign
+  , count(1) as pageviews
+  , count(distinct anonymous_id) as visitors
+from dp_bi.rudderstack_events
+where
+  date(timestamp) >= '2024-04-09'
+group by all
 ), user_att as (
 select
   brand
@@ -72,6 +84,8 @@ select
   , s.spend_day60
   , s.impressions
   , s.clicks
+  , v.pageviews
+  , v.visitors
   , u.unq_anons as new_prospects
   , u.total_lead_gen as new_leads
   , u.unq_users as new_users
@@ -80,7 +94,7 @@ select
   , u.total_begin_checkout
   , u.total_purchase
   , u.revenue_day7
-  , u.revenue_day14
+  , u.revenue_day14 
   , u.revenue_day30
   , u.revenue_day60
   , u.revenue_total
@@ -90,11 +104,16 @@ select
   , u.first_event_2_purchase_days
   , u.quote_2_purchase_days
 from user_att as u
-left outer join source_spend s
+left outer join source_spend as s
   on s.brand = u.brand
   and s.spend_date = u.attrabtion_date
   and s.source = u.source
   and s.campaign = u.campaign
+left outer join site_visits as v
+  on v.brand = u.brand
+  and v.event_date = u.attrabtion_date
+  and v.source = u.source
+  and v.campaign = u.campaign
 )
 select 
   *
@@ -109,7 +128,6 @@ select
 from campaigns
 order by 1, 2, 3, 4
 ;
-
 
 drop table if exists dp_staging.utm_campaigns_backup;
 create table if not exists dp_staging.utm_campaigns_backup as

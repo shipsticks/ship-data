@@ -5,9 +5,8 @@ from google.cloud import bigquery
 GCP_PROJECT = "gse-dw-prod"
 bq_client = bigquery.Client(project=GCP_PROJECT)
 
-# @logger.catch
+
 def run_sql(sql_file: str = None, sql: str = None) -> None:
-    
     working_dir = os.getcwd()
     full_path = working_dir + f"/sql/{sql_file}"
     if sql_file is not None:
@@ -33,11 +32,11 @@ def run_sql(sql_file: str = None, sql: str = None) -> None:
 def discovery_env() -> list[str]:
     local_files = os.listdir(os.getcwd())
     logger.info(f"Discovered files: {local_files}")
+    return local_files
 
 
 def run_workflow() -> None:
     discovery_env()
-    run_sql(sql="select 1/0 as test")
     run_sql("rudderstack_events.sql")
     run_sql("ad_spend.sql")
     run_sql("prospect_attrabution.sql")

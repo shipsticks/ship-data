@@ -20,7 +20,7 @@ select
   , min(if(event = 'purchase', timestamp, null)) as first_purchase_at
   , min(user_email) as user_email
   , sum(revenue) as total_rs_revenue
-from dp_staging.meta_events
+from dp_bi.rudderstack_events
 group by all
 )
 select
@@ -106,10 +106,10 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
-  , e.domain || e.url_path as landing_page
+  , e.url as landing_page
   , min(e.timestamp) as attrabtion_at
 from dp_staging.att_1 as s
-join dp_staging.meta_events as e
+join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
   and date(e.timestamp) between date(s.first_event_at) and date(s.user_created_at)
 where
@@ -128,10 +128,10 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
-  , e.domain || e.url_path as landing_page
+  , e.url as landing_page
   , min(e.timestamp) as attrabtion_at
 from dp_staging.att_1 as s
-join dp_staging.meta_events as e
+join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
 where
   s.user_type = 'prospect'

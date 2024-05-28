@@ -1,3 +1,105 @@
+drop table if exists dp_bi.utm_campaigns;
+create table if not exists dp_bi.utm_campaigns as
+with site_visits as (
+select
+  brand
+  , date(timestamp) as event_date
+  , channel
+  , source
+  , utm_medium
+  , utm_source
+  , utm_campaign
+  , count(1) as page_views
+  , count(distinct anonymous_id) as site_visits
+from dp_bi.rudderstack_events
+where
+  date(timestamp) >= '2024-04-09'
+group by all
+), user_att as (
+select
+  brand
+  , date(attrabtion_at) as attrabtion_date
+  , channel
+  , source
+  , utm_medium
+  , utm_source
+  , utm_campaign
+  -- , landing_page
+  , count(1) as unq_anons
+  , count(distinct user_id) as unq_users
+  , count(first_sign_up_at) as total_sign_up
+  , count(first_login_at) as total_login
+  , count(first_generate_lead_at) as total_lead_gen
+  , count(first_quote_at) as total_quote
+  , count(first_start_shipping_at) as total_start_shipping
+  , count(first_begin_checkout_at) as total_begin_checkout
+  , count(first_purchase_at) as total_purchase
+  , sum(ltv_day7) as revenue_day7
+  , sum(ltv_day14) as revenue_day14
+  , sum(ltv_day30) as revenue_day30
+  , sum(ltv_day60) as revenue_day60
+  , sum(ltv_full) as revenue_total
+
+  -- from first event diffs
+  , sum(timestamp_diff(user_created_at, first_event_at, day)) as first_event_2_user_days
+  , sum(timestamp_diff(first_generate_lead_at, first_event_at, day)) as first_event_2_lead_days
+  , sum(timestamp_diff(first_purchase_at, first_event_at, day)) as first_event_2_purchase_days
+  
+  -- purchase funnel diffs
+  , sum(timestamp_diff(first_quote_at, first_event_at, day)) as first_event_2_quote_days
+  , sum(timestamp_diff(first_start_shipping_at, first_quote_at, day)) as quote_2_start_shipping_days
+  , sum(timestamp_diff(first_begin_checkout_at, first_start_shipping_at, day)) as start_shipping_2_begin_checkout_days
+  , sum(timestamp_diff(first_purchase_at, first_begin_checkout_at, day)) as begin_checkout_2_purchase_days
+
+  , sum(timestamp_diff(first_purchase_at, first_quote_at, day)) as quote_2_purchase_days
+from dp_bi.prospects
+where 
+  attrabtion_at is not null
+  and is_admin is not true
+  and is_pro is not true
+group by all
+)
+select
+  -- coalesce(v.brand, u.brand) as brand
+  -- , coalesce(v.spend_date, u.attrabtion_date) as event_date
+  -- , coalesce(v.source, u.source) as source
+  -- , coalesce(v.campaign_name, u.campaign) as campaign
+  -- , landing_page
+  v.brand
+  , v.event_date
+  , v.channel
+  , v.utm_medium
+  , v.utm_source
+  , v.utm_campaign
+  , v.page_views
+  , v.site_visits
+  , u.unq_anons as new_prospects
+  , u.total_lead_gen as new_leads
+  , u.unq_users as new_users
+  , u.total_quote
+  , u.total_start_shipping
+  , u.total_begin_checkout
+  , u.total_purchase
+  , u.revenue_day7
+  , u.revenue_day14 
+  , u.revenue_day30
+  , u.revenue_day60
+  , u.revenue_total
+  , u.first_event_2_user_days
+  , u.first_event_2_lead_days
+  , u.first_event_2_quote_days
+  , u.first_event_2_purchase_days
+  , u.quote_2_purchase_days
+from site_visits as v
+left outer join user_att as u
+  on v.brand = u.brand
+  and v.event_date = u.attrabtion_date
+  and v.utm_medium = u.utm_medium
+  and v.utm_source = u.utm_source
+  and v.utm_campaign = u.utm_campaign
+;
+
+
 -- aggragete campaign metrics
 drop table if exists dp_staging.campaign_metrics;
 create table if not exists dp_staging.campaign_metrics as

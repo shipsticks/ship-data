@@ -31,8 +31,8 @@ select
   , nullif(`Item Type Temp`, '<NA>') as item_type
   , null as leg_id
   , nullif(micro_site_id,'<NA>') as micro_site_id
-  , null as internal_order_id
-  , nullif(`Order ID`, '<NA>') as order_id
+  , order_id
+  , nullif(`Order ID`, '<NA>') as internal_order_id
   , null as order_line_item_category
   , nullif(`Order Line Item ID`, '<NA>') as order_line_item_id
   , null as origination_ship_point_address_type

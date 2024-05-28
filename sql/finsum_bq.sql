@@ -20,10 +20,11 @@ select
   , order_id
   , nullif(`Order ID`, '<NA>') as internal_order_id
   , null as order_line_item_category
+  , `Order Line Item Price Cents` as order_line_item_price_cents 
   , nullif(`Order Line Item ID`, '<NA>') as order_line_item_id
   , nullif(payment_method_id, '<NA>') as payment_method_id
   , nullif(`Payment Method Type`, '<NA>') as payment_method_type
-  , null as payment_method 
+  , null as payment_method
   , price_cents as price_cents
   , nullif(`Shipment State`, '<NA>') as shipment_state
   , null as shipment_actual_delivery
@@ -42,5 +43,6 @@ select
   , `User is Admin` as user_is_admin
   , `User is Pro` as user_is_pro
   , `v5 Insurance Value` as insurance_value
+  , `v5 Product Type` as product_type
 from `bi.financial_summary_detail_v5`
 ;

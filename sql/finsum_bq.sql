@@ -3,7 +3,7 @@ create or replace table `dp_bi.finsum_bq`
 partition by date_trunc(transaction_date_financial, month)
 as
 select
-  null as booked_by_csr_user_id
+    null as booked_by_csr_user_id
   , nullif(Brand, '<NA>') as brand
   , null as carrier
   , carrier_id as carrier_id
@@ -13,20 +13,6 @@ select
   , nullif(`Carrier Tracking ID`, '<NA>') as carrier_tracking_id
   , cost_cents as cost_cents
   , nullif(coupon_id, '<NA>') as coupon_id
-  , null as destination_ship_point_address_type
-  , null as destination_ship_point_attention_name
-  , null as destination_ship_point_city
-  , null as destination_ship_point_company_name
-  , null as destination_ship_point_country_code
-  , null as destination_ship_point_cruise
-  , null as destination_ship_point_delivery_address_line
-  , null as destination_ship_point_delivery_address_line_1
-  , null as destination_ship_point_facility_id
-  , null as destination_ship_point_google_place_id
-  , null as destination_ship_point_lat
-  , null as destination_ship_point_lng
-  , null as destination_ship_point_state
-  , null as destination_ship_point_zip5
   , `Estimated Ship Date` as estimated_ship_date
   , nullif(`Item Type Temp`, '<NA>') as item_type
   , null as leg_id
@@ -35,22 +21,9 @@ select
   , nullif(`Order ID`, '<NA>') as internal_order_id
   , null as order_line_item_category
   , nullif(`Order Line Item ID`, '<NA>') as order_line_item_id
-  , null as origination_ship_point_address_type
-  , null as origination_ship_point_attention_name
-  , null as origination_ship_point_city
-  , null as origination_ship_point_company_name
-  , null as origination_ship_point_country_code
-  , null as origination_ship_point_cruise
-  , null as origination_ship_point_delivery_address_line
-  , null as origination_ship_point_delivery_address_line_1
-  , null as origination_ship_point_facility_id
-  , null as origination_ship_point_google_place_id
-  , null as origination_ship_point_lat
-  , null as origination_ship_point_lng
-  , null as origination_ship_point_state
-  , null as origination_ship_point_zip5
   , nullif(payment_method_id, '<NA>') as payment_method_id
-  , nullif(`Payment Method Type`, '<NA>') as payment_method
+  , nullif(`Payment Method Type`, '<NA>') as payment_method_type
+  , null as payment_method 
   , price_cents as price_cents
   , nullif(`Shipment State`, '<NA>') as shipment_state
   , null as shipment_actual_delivery

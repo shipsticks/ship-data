@@ -4,12 +4,13 @@ partition by date_trunc(transaction_date_financial, month)
 as
 select
   nullif(Brand, '<NA>') as brand
+  , nullif(brand_id, '<NA>') as brand_id
   -- dates
   , date(`Transaction Date - Action`) as transaction_action_date
   , datetime(`Transaction Date - Action Timestamp`) as transaction_action_at
   , date(`Transaction Date - Financial`) as transaction_financial_date
   , date(`Shipment Created At`) as shipment_created_date
-  , `Estimated Ship Date` as estimated_ship_date
+  , date(`Estimated Ship Date`) as estimated_ship_date
   , null as shipment_actual_delivery_date 
   , null as shipment_estimated_delivery
   -- metrics

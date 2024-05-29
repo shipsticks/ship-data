@@ -40,7 +40,9 @@ def run_workflow() -> None:
     run_sql("rudderstack_events.sql")
     run_sql("ad_spend.sql")
     run_sql("prospect_attrabution.sql")
+    run_sql("old_campaigns.sql")
     run_sql("utm_campaigns.sql")
+    run_sql("paid_campaigns.sql")
     run_sql("users.sql")
 
 

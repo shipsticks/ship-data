@@ -95,11 +95,18 @@ from dp_staging.google_ads_spend
 where spend > 0
 )
 select 
-  * 
+  spend_date
+  , channel
+  , source
+  , brand
+  , campaign
+  , coalesce(campaign_name, campaign) as campaign_name
+  , spend
   , if(spend_date >= date_sub(current_date(), interval 7 day), null, spend) as spend_day7
   , if(spend_date >= date_sub(current_date(), interval 14 day), null, spend) as spend_day14
   , if(spend_date >= date_sub(current_date(), interval 30 day), null, spend) as spend_day30
-  , if(spend_date >= date_sub(current_date(), interval 60 day), null, spend) as spend_day60
+  , impressions
+  , clicks
 from source_spend
 order by 1 desc, 2, 3, 4, 5, 6
 ;

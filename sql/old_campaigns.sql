@@ -11,10 +11,9 @@ select
   , sum(spend_day7) as spend_day7
   , sum(spend_day14) as spend_day14
   , sum(spend_day30) as spend_day30
-  , sum(spend_day60) as spend_day60
   , sum(impressions) as impressions
   , sum(clicks) as clicks
-from dp_staging.source_spend
+from `dp_bi.ad_spend`
 where spend_date >= '2024-04-09'
 group by all
 ), site_visits as (
@@ -48,7 +47,6 @@ select
   , sum(ltv_day7) as revenue_day7
   , sum(ltv_day14) as revenue_day14
   , sum(ltv_day30) as revenue_day30
-  , sum(ltv_day60) as revenue_day60
   , sum(ltv_full) as revenue_total
 
   -- from first event diffs
@@ -80,7 +78,7 @@ select
   , s.spend_day7
   , s.spend_day14
   , s.spend_day30
-  , s.spend_day60
+
   , s.impressions
   , s.clicks
   , v.pageviews
@@ -95,7 +93,7 @@ select
   , u.revenue_day7
   , u.revenue_day14 
   , u.revenue_day30
-  , u.revenue_day60
+
   , u.revenue_total
   , u.first_event_2_user_days
   , u.first_event_2_lead_days

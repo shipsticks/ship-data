@@ -5,6 +5,7 @@ as
 select
   -- dates
   date(`Transaction Date - Financial`) as transaction_financial_date
+  , date(`Transaction Timestamp - Financial`) as transaction_financial_at
   , date(`Transaction Date - Action`) as transaction_action_date
   , datetime(`Transaction Date - Action Timestamp`) as transaction_action_at
   , date(`Shipment Created At`) as shipment_created_date

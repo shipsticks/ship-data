@@ -14,7 +14,8 @@ create table if not exists dp_bi.rudderstack_events as
 with events as (
 select
   id 
-  , timestamp
+  , timestamp as timestamp_utc
+  , datetime(timestamp, 'America/New_York') as timestamp_nyc
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
   , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
@@ -38,7 +39,8 @@ union all
 
 select
   id 
-  , timestamp
+  , timestamp as timestamp_utc
+  , datetime(timestamp, 'America/New_York') as timestamp_nyc
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
   , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
@@ -63,7 +65,8 @@ union all
 
 select
   id 
-  , timestamp
+  , timestamp as timestamp_utc
+  , datetime(timestamp, 'America/New_York') as timestamp_nyc
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
   , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
@@ -87,7 +90,8 @@ union all
 
 select
   id 
-  , timestamp
+  , timestamp as timestamp_utc
+  , datetime(timestamp, 'America/New_York') as timestamp_nyc
   , context_session_id as session_id
   , net.reg_domain(context_page_url) as domain
   , replace(replace(split(context_page_tab_url, '.com')[offset(0)], 'https://', ''), 'www.', '') || '.com' || context_page_path as url
@@ -151,11 +155,11 @@ select
       when (contains_substr(utm_source, 'google') or contains_substr(utm_source, 'adwords')) then 'Google'
       else null
     end as paid_digital
-  , case when contains_substr(utm_source, 'bing') 
-      or contains_substr(utm_source, 'facebook') 
+  , case when contains_substr(utm_source, 'bing')
+      or contains_substr(utm_source, 'facebook')
       or contains_substr(utm_source, 'fb')
       or contains_substr(utm_source, 'google')
-      or contains_substr(utm_source, 'adwords') 
+      or contains_substr(utm_source, 'adwords')
       then True else False
     end is_paid_digital
   , case when utm_source is not null
@@ -177,5 +181,5 @@ select
 from events
 where 
   domain not in ('ledgesvacationrentals.com', 'rtcc.net')
-  and timestamp >= '2024-04-09'
+  and timestamp_utc >= '2024-04-09'
 ;

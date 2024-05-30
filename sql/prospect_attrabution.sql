@@ -9,15 +9,15 @@ select
   , min(user_id) as user_id
   , count(distinct if(is_non_email_source is true, utm_source, null)) as unq_att_noemail_source
   , count(distinct if(paid_digital is not null, utm_source, null)) as unq_att_paid_source
-  , min(timestamp) as first_event_at
-  , min(if(event = 'login', timestamp, null)) as first_login_at
-  , min(if(user_id is not null, timestamp, null)) as first_user_id_at
-  , min(if(event = 'sign_up', timestamp, null)) as first_sign_up_at
-  , min(if(event = 'generate_lead', timestamp, null)) as first_generate_lead_at
-  , min(if(event in ('quick_quote', 'pricing_page_quote'), timestamp, null)) as first_quote_at
-  , min(if(event = 'start_shipping', timestamp, null)) as first_start_shipping_at
-  , min(if(event = 'begin_checkout', timestamp, null)) as first_begin_checkout_at
-  , min(if(event = 'purchase', timestamp, null)) as first_purchase_at
+  , min(timestamp_utc) as first_event_at
+  , min(if(event = 'login', timestamp_utc, null)) as first_login_at
+  , min(if(user_id is not null, timestamp_utc, null)) as first_user_id_at
+  , min(if(event = 'sign_up', timestamp_utc, null)) as first_sign_up_at
+  , min(if(event = 'generate_lead', timestamp_utc, null)) as first_generate_lead_at
+  , min(if(event in ('quick_quote', 'pricing_page_quote'), timestamp_utc, null)) as first_quote_at
+  , min(if(event = 'start_shipping', timestamp_utc, null)) as first_start_shipping_at
+  , min(if(event = 'begin_checkout', timestamp_utc, null)) as first_begin_checkout_at
+  , min(if(event = 'purchase', timestamp_utc, null)) as first_purchase_at
   , min(user_email) as user_email
   , sum(revenue) as total_rs_revenue
 from dp_bi.rudderstack_events
@@ -107,16 +107,16 @@ select
   , e.utm_source
   , e.utm_campaign
   , e.url as landing_page
-  , min(e.timestamp) as attrabtion_at
+  , min(e.timestamp_utc) as attrabtion_at
 from dp_staging.att_1 as s
 join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
-  and date(e.timestamp) between date(s.first_event_at) and date(s.user_created_at)
+  and date(e.timestamp_utc) between date(s.first_event_at) and date(s.user_created_at)
 where
   s.user_type = 'user-created-post-rudder'
   and e.is_non_email_source = True 
 group by all
-qualify row_number() over (partition by e.anonymous_id, s.brand order by min(e.timestamp)) = 1
+qualify row_number() over (partition by e.anonymous_id, s.brand order by min(e.timestamp_utc)) = 1
 
 union all
 
@@ -129,7 +129,7 @@ select
   , e.utm_source
   , e.utm_campaign
   , e.url as landing_page
-  , min(e.timestamp) as attrabtion_at
+  , min(e.timestamp_utc) as attrabtion_at
 from dp_staging.att_1 as s
 join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
@@ -137,7 +137,7 @@ where
   s.user_type = 'prospect'
   and e.is_non_email_source = True
 group by all
-qualify row_number() over (partition by e.anonymous_id, s.brand order by min(e.timestamp)) = 1
+qualify row_number() over (partition by e.anonymous_id, s.brand order by min(e.timestamp_utc)) = 1
 ;
 
 
@@ -178,22 +178,6 @@ join dp_staging.att_3 as b
   on a.anonymous_id = b.anonymous_id
   and a.brand = b.brand
 ;
-
-
--- dedup users with multiple anonymous_ids
--- drop table if exists dp_staging.att_5a;
--- create table if not exists dp_staging.att_5a as
--- select *
--- from dp_staging.att_4
--- where user_id is null
-
--- union all
-
--- select *
--- from dp_staging.att_4
--- where user_id is not null
--- qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
--- ;
 
 
 -- dedup users with multiple anonymous_ids, use first non-organic anon if present.

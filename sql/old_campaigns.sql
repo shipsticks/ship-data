@@ -19,14 +19,14 @@ group by all
 ), site_visits as (
 select
   brand
-  , date(timestamp) as event_date
+  , date(timestamp_utc) as event_date
   , source
   , utm_campaign as campaign
   , count(1) as pageviews
   , count(distinct anonymous_id) as visitors
 from dp_bi.rudderstack_events
 where
-  date(timestamp) >= '2024-04-09'
+  date(timestamp_utc) >= '2024-04-09'
 group by all
 ), user_att as (
 select

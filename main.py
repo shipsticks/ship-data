@@ -20,11 +20,10 @@ def run_sql(sql_file: str = None, sql: str = None) -> None:
 
     try:
         # run sql job
-        logger.info(f"Executing: {sql_file}")
         bigquery_job = bq_client.query(sql)
+        logger.info(f"Executing: {sql_file} - job-id: {bigquery_job}")
         # get results
         _ = bigquery_job.result()
-        logger.info(f"Completed: {sql_file} - job-id: {bigquery_job}")
     except Exception:
         logger.exception(f"Error: {sql_file}", exc_info=True)
 

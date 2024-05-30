@@ -3,7 +3,7 @@ create table if not exists dp_bi.utm_campaigns as
 with site_visits as (
 select
   brand
-  , date(timestamp) as event_date
+  , date(timestamp_utc) as event_date
   , channel
   , source
   -- , utm_medium
@@ -13,7 +13,7 @@ select
   , count(distinct anonymous_id) as site_visits
 from dp_bi.rudderstack_events
 where
-  date(timestamp) >= '2024-04-09'
+  date(timestamp_utc) >= '2024-04-09'
 group by all
 ), user_att as (
 select

@@ -26,6 +26,7 @@ select
   , u.begin_checkout
   , u.sign_up
   , u.login
+  , u.purchase
   , u.revenue_day7
   , u.revenue_day14 
   , u.revenue_day30

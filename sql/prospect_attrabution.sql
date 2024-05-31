@@ -252,6 +252,8 @@ create table if not exists dp_bi.prospects as
 with tmp as (
 select
   u.*
+  , min(f.`Shipment Created At Timestamp`) as first_shipment_at
+  , min(f.`Transaction Timestamp - Financial`) as first_transaction_at
   , sum(case when f.`Shipment Created At` >= date(u.attrabtion_at)
           and f.`Shipment Created At` <= date_add(date(u.attrabtion_at), interval 7 day) 
           then f.price_cents else 0 end) / 100 as ltv_day7

@@ -1,5 +1,5 @@
-drop table if exists `dp_bi.finsum_bq`;
-create or replace table `dp_bi.finsum_bq`
+drop table if exists dp_bi.finsum;
+create or replace table dp_bi.finsum
 partition by date_trunc(transaction_financial_date, month)
 as
 select
@@ -45,7 +45,7 @@ select
   , nullif(`Order Line Item Category`,'<NA>')  as order_line_item_category
   , nullif(`Order Line Item ID`, '<NA>') as order_line_item_id
   , nullif(payment_method_id, '<NA>') as payment_method_id
-  , nullif(`Payment Method Type`, '<NA>') as payment_method
+  , nullif(`Payment Method`, '<NA>') as payment_method
   , nullif(`Shipment State`, '<NA>') as shipment_state
   , nullif(`Tracking ID`, '<NA>') as tracking_id
   , nullif(traveler_id, '<NA>') as traveler_id

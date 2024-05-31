@@ -125,16 +125,3 @@ select
 from campaigns
 order by 1, 2, 3, 4
 ;
-
--- drop table if exists dp_staging.utm_campaigns_backup;
--- create table if not exists dp_staging.utm_campaigns_backup as
--- select *
--- from dp_bi.utm_campaigns
--- ;
-
-
--- drop table if exists dp_bi.utm_campaigns;
--- create table if not exists dp_bi.utm_campaigns as
--- select *
--- from dp_staging.campaign_metrics
--- ;

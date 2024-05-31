@@ -1,13 +1,24 @@
 drop table if exists dp_bi.paid_campaigns;
 create table if not exists dp_bi.paid_campaigns as
 with ad_spend as (
-select *
+select 
+  brand
+  , spend_date
+  , source
+  , campaign_name
+  , campaign
+  , spend
+  , spend_day7
+  , spend_day14
+  , spend_day30
+  , impressions
+  , clicks
 from dp_bi.ad_spend
 where spend_date >= '2024-04-09'    
 ), metrics as (
 select
   coalesce(s.brand, u.brand) as brand
-  , coalesce(s.spend_date, u.event_date) as event_date
+  , coalesce(s.spend_date, u.attrabtion_date) as event_date
   , coalesce(s.source, u.source) as source
   , coalesce(s.campaign_name, u.utm_campaign) as campaign
   , s.spend
@@ -16,8 +27,6 @@ select
   , s.spend_day30
   , s.impressions
   , s.clicks
-  , u.page_views
-  , u.site_visits
   , u.prospects
   , u.leads
   , u.users
@@ -31,17 +40,12 @@ select
   , u.revenue_day14 
   , u.revenue_day30
   , u.revenue_total
-  , u.first_event_2_lead_days
-  , u.first_event_2_quote_days
-  , u.first_event_2_user_days
-  , u.first_event_2_purchase_days
-  , u.quote_2_purchase_days
 from dp_bi.utm_campaigns as u
 full outer join ad_spend as s
   on s.brand = u.brand
-  and s.spend_date = u.event_date
+  and s.spend_date = u.attrabtion_date
   and s.source = u.source
-  and s.campaign = u.utm_campaign
+  and s.campaign = u.utm_campaign 
 )
 select 
   *

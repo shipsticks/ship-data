@@ -45,7 +45,7 @@ select
   , nullif(`Order Line Item Category`,'<NA>')  as order_line_item_category
   , nullif(`Order Line Item ID`, '<NA>') as order_line_item_id
   , nullif(payment_method_id, '<NA>') as payment_method_id
-  , nullif(`Payment Method`, '<NA>') as payment_method
+  , null as payment_method
   , nullif(`Shipment State`, '<NA>') as shipment_state
   , nullif(`Tracking ID`, '<NA>') as tracking_id
   , nullif(traveler_id, '<NA>') as traveler_id

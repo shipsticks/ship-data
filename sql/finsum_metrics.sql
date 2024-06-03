@@ -60,7 +60,7 @@ select distinct
 
    --, count(distinct(case when shipment_actual_delivery_date >= begintime and shipment_actual_delivery_date endtime and transaction_reporting_state = 'enqueued' then tracking_id end)) as delivered   
 
-from dp_bi.finsum_bq
+from dp_bi.finsum
 where transaction_financial_date >= begintime and transaction_financial_date <= endtime
 --where order_id = 'O02232B713163' and transaction_financial_date = '2023-02-15' --spot check order (with partitioned date field)
   

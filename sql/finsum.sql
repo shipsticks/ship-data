@@ -16,6 +16,7 @@ select
   -- metrics
   , price_cents
   , cost_cents
+  , `Order Line Item Price Cents` as order_line_item_price_cents
   , `v5 Insurance Value` as insurance_value
   -- dimensions
   , nullif(Brand, '<NA>') as brand

@@ -10,13 +10,12 @@ select
   , datetime(`Transaction Date - Action Timestamp`) as transaction_action_at
   , date(`Shipment Created At`) as shipment_created_date
   , datetime(`Shipment Created At Timestamp`) as shipment_created_at
-  , date(`Estimated Ship Date`) as estimated_ship_date
+  , date(`Estimated Ship Date`) as shipment_estimated_ship_date
   , null as shipment_actual_delivery_date 
   , null as shipment_estimated_delivery_date
   -- metrics
-  , price_cents
+  , `Order Line Item Price Cents` as price_cents
   , cost_cents
-  , `Order Line Item Price Cents` as order_line_item_price_cents
   , `v5 Insurance Value` as insurance_value
   -- dimensions
   , nullif(Brand, '<NA>') as brand

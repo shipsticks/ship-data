@@ -1,12 +1,5 @@
--- credit waterfall (at shipment level)
--- 1) club pro
--- 2) travel-agent user role
--- 3) utm attrabution
--- 4) micro-site 
--- 5) travel referrals
-
--- drop table if exists dp_bi.finsum;
--- create or replace table dp_bi.finsum as
+drop table if exists dp_staging.finsum_b2b;
+create or replace table dp_staging.finsum_b2b as
 with finsum_0 as (
 select *
 from dp_bi.finsum
@@ -14,8 +7,8 @@ where transaction_financial_date >= '2024-01-01'
 ), finsum_1 as (
 select
   f.*
-  , m.name as mico_site
-  , m.sub_domain as mico_site_subdomain
+  , m.name as micro_site
+  , m.sub_domain as micro_site_subdomain
 from finsum_0 as f
 left outer join mongo_land.micro_sites as m 
   on f.micro_site_id = m._id
@@ -25,6 +18,7 @@ select
   , t.travel_company
   , t.travel_network
   , t.agent_name
+  , if(t.travel_company is not null or t.travel_network is not null or t.agent_name is not null, true, null) as travel_referral
 from finsum_1 as f
 left outer join mongo_land.travel_referrals as t
   on f.internal_order_id = t.order_id
@@ -38,6 +32,7 @@ select
   , ship_to_address_state
   , no_pro
   , pro_name
+  , if(pro_name is not null, true, false) as club_pro
   , user_id
   , micro_site_id
   , facility_type
@@ -64,11 +59,24 @@ left outer join club_pros as p
 ), finsum_4 as (
 select
   f.*
-  , u.segment_user_profile_is_travel_agent as is_travel_agent
+  , if(u.segment_user_profile_is_travel_agent is true, true, null) as is_travel_agent
 from finsum_3 as f
 left outer join mongo_land.users as u
   on u._id = f.user_id
 )
-select *
+select 
+  *
+  , case when pro_name is not null then 'club_pro'
+      when pro_name is null and is_travel_agent is true then 'travel_agent'
+      when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
+      when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
+      end as b2b_revenue_attrabution
 from finsum_4
 ;
+
+-- credit waterfall (at shipment level)
+-- 1) club pro
+-- 2) travel-agent user role
+-- 3) utm attrabution
+-- 4) micro-site 
+-- 5) travel referrals

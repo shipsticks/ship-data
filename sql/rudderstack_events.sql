@@ -146,7 +146,7 @@ select
       when (contains_substr(utm_source, 'facebook') or contains_substr(utm_source, 'fb')) then 'Facebook'
       when (contains_substr(utm_source, 'google') or contains_substr(utm_source, 'adwords')) then 'Google'
       when contains_substr(utm_source, 'email') then 'Sailthru'
-      when contains_substr(utm_source, 'organic') or utm_source = '<NA>' then 'Organic'
+      when contains_substr(utm_source, 'organic') or utm_source = '<NA>' or utm_source is null then 'Organic'
       else utm_source
     end as source
   , case 

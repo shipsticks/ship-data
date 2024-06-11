@@ -2,9 +2,9 @@ drop table if exists dp_bi.finsum_metrics;
 create or replace table dp_bi.finsum_metrics as
 select distinct
   brand
-  , '' as carrier
+  , carrier
   , carrier_display_name
-  , '' as payment_method
+  , payment_method
   , transaction_financial_date
 
   , (count(distinct case when transaction_reporting_state = 'enqueued' then tracking_id end) -

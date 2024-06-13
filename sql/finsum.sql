@@ -71,7 +71,7 @@ select
   , if(t.travel_network = '' or travel_network = 'None', null, t.travel_network) as travel_network
   , if(t.travel_company = '', null, t.travel_company) as travel_company
   , if(t.agent_name = '', null, t.agent_name) as agent_name
-  , if(t.travel_company <> '' or t.travel_network <> '' or t.agent_name <> '',true, null) as travel_referral
+  , if(t.travel_company <> '' or t.travel_network <> '' or t.agent_name <> '' or travel_network <> 'None', true, null) as travel_referral
 from finsum_1 as f
 left outer join mongo_land.travel_referrals as t
   on f.internal_order_id = t.order_id

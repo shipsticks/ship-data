@@ -60,19 +60,55 @@ from `bi.financial_summary_detail_v5`
 ), finsum_1 as (
 select
   f.*
+  , origination_ship_point_address_type
+  , origination_ship_point_attention_name
+  , origination_ship_point_city
+  , origination_ship_point_company_name
+  , origination_ship_point_country_code
+  , origination_ship_point_delivery_address_line
+  , origination_ship_point_delivery_address_line_1
+  , origination_ship_point_facility_id
+  , origination_ship_point_google_place_id
+  , origination_ship_point_lat
+  , origination_ship_point_lng
+  , origination_ship_point_phone_number
+  , origination_ship_point_service_area_code
+  , origination_ship_point_state
+  , origination_ship_point_zip5
+  , destination_ship_point_address_type
+  , destination_ship_point_attention_name
+  , destination_ship_point_city
+  , destination_ship_point_company_name
+  , destination_ship_point_country_code
+  , destination_ship_point_delivery_address_line
+  , destination_ship_point_delivery_address_line_1
+  , destination_ship_point_facility_id
+  , destination_ship_point_google_place_id
+  , destination_ship_point_lat
+  , destination_ship_point_lng
+  , destination_ship_point_phone_number
+  , destination_ship_point_service_area_code
+  , destination_ship_point_state
+  , destination_ship_point_zip5
+from finsum_0 as f
+left outer join `mongo_land.v5_shipments` as s
+  on f.shipment_id = s.shipment_id
+), finsum_2 as (
+select
+  f.*
   , m.name as micro_site
   , m.sub_domain as micro_site_subdomain
-from finsum_0 as f
+from finsum_1 as f
 left outer join mongo_land.micro_sites as m 
   on f.micro_site_id = m._id
-), finsum_2 as (
+), finsum_3 as (
 select 
   f.*
   , if(t.travel_network = '' or travel_network = 'None', null, t.travel_network) as travel_network
   , if(t.travel_company = '', null, t.travel_company) as travel_company
   , if(t.agent_name = '', null, t.agent_name) as agent_name
   , if(t.travel_company <> '' or t.travel_network <> '' or t.agent_name <> '' or travel_network <> 'None', true, null) as travel_referral
-from finsum_1 as f
+from finsum_2 as f
 left outer join mongo_land.travel_referrals as t
   on f.internal_order_id = t.order_id
 ), club_pros as (
@@ -95,7 +131,7 @@ join `mongo_land.brands` as b
 where 
   c.no_pro is false
   and c.user_id <> '<NA>'
-), finsum_3 as (
+), finsum_4 as (
 select
   f.*
   , p.club_id
@@ -106,14 +142,14 @@ select
   , p.ship_to_address_state
   , p.pro_name
   , p.facility_type
-from finsum_2 as f
+from finsum_3 as f
 left outer join club_pros as p 
   on p.user_id = f.user_id
-), finsum_4 as (
+), finsum_5 as (
 select
   f.*
   , if(u.segment_user_profile_is_travel_agent is true, true, null) as is_travel_agent
-from finsum_3 as f
+from finsum_4 as f
 left outer join mongo_land.users as u
   on u._id = f.user_id
 )
@@ -124,7 +160,7 @@ select
       when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
       when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
       end as b2b_revenue_attrabution
-from finsum_4
+from finsum_5
 ;
 
 -- credit waterfall (at shipment level)

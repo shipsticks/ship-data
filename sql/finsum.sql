@@ -116,12 +116,14 @@ left outer join club_pros as p
 select
   f.*
   , if(u.segment_user_profile_is_travel_agent is true, true, null) as is_travel_agent
+  , min(f.transaction_financial_date) over (partition by f.user_id, f.brand) as first_transaction_date
 from finsum_3 as f
 left outer join mongo_land.users as u
   on u._id = f.user_id
 )
 select 
   *
+  , case when transaction_financial_date = first_transaction_date then 1 else 0 end as is_first_transaction
   , case when pro_name is not null then 'club_pro'
       when pro_name is null and is_travel_agent is true then 'travel_agent'
       when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'

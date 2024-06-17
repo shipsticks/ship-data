@@ -1,10 +1,11 @@
 drop table if exists dp_bi.finsum;
-create or replace table dp_bi.finsum as
-with finsum_0 as (
+create or replace table dp_bi.finsum 
+partition by date_trunc(transaction_financial_date, month) as
+with base_finsum as (
 select
   -- dates
   date(`Transaction Date - Financial`) as transaction_financial_date
-  , date(`Transaction Timestamp - Financial`) as transaction_financial_at
+  , datetime(`Transaction Timestamp - Financial`) as transaction_financial_at
   , date(`Transaction Date - Action`) as transaction_action_date
   , datetime(`Transaction Date - Action Timestamp`) as transaction_action_at
   , date(`Shipment Created At`) as shipment_created_date
@@ -57,24 +58,24 @@ select
   , `User is Admin` as user_is_admin
   , `User is Pro` as user_is_pro
 from bi.financial_summary_detail_v5
-), finsum_1 as (
+), microsites as (
 select
   f.*
   , m.name as micro_site
   , m.sub_domain as micro_site_subdomain
-from finsum_0 as f
+from base_finsum as f
 left outer join mongo_land.micro_sites as m 
   on f.micro_site_id = m._id
 where 
   m._id not in('62975451141c04016357d2bf', '64088dd9b3a8d901c073cf31','6400d8f4b4046e01cff6b6c5','610bfa7a2c4fc90176f1652f','55e9751dce94aa501750fd49e','55e35349af5ff72330000019','54ecdb77f4825e54fb000012')  
-), finsum_2 as (
+), travel_referrals as (
 select 
   f.*
   , if(t.travel_network = '' or travel_network = 'None', null, t.travel_network) as travel_network
   , if(t.travel_company = '', null, t.travel_company) as travel_company
   , if(t.agent_name = '', null, t.agent_name) as agent_name
   , if(t.travel_company <> '' or t.travel_network <> '' or t.agent_name <> '' or travel_network <> 'None', true, null) as travel_referral
-from finsum_1 as f
+from microsites as f
 left outer join mongo_land.travel_referrals as t
   on f.internal_order_id = t.order_id
 ), club_pros as (
@@ -98,7 +99,7 @@ where
   c.club_id not in('5a95de7535db5c0188001688','54da0c49f4825eb481000033','6218f0600f46db01612acdfa','5879035aaf5ff75f63000092','650327797de1ee01508fc7f6','JAP-01-0162')
   and c.no_pro is false
   and c.user_id <> '<NA>'
-), finsum_3 as (
+), clubs as (
 select
   f.*
   , p.club_id
@@ -109,25 +110,29 @@ select
   , p.ship_to_address_state
   , p.pro_name
   , p.facility_type
-from finsum_2 as f
+from travel_referrals as f
 left outer join club_pros as p 
   on p.user_id = f.user_id
-), finsum_4 as (
+), travel_agent as (
 select
   f.*
   , if(u.segment_user_profile_is_travel_agent is true, true, null) as is_travel_agent
-  , min(f.transaction_financial_date) over (partition by f.user_id, f.brand) as first_transaction_date
-from finsum_3 as f
+from clubs as f
 left outer join mongo_land.users as u
   on u._id = f.user_id
+), first_transaction as (
+select 
+    f.*
+    , min(f.transaction_financial_date) over (partition by f.user_id, f.brand) as first_transaction_date
+from travel_agent f    
 )
 select 
   *
-  , case when transaction_financial_date = first_transaction_date then 1 else 0 end as is_first_transaction
-  , case when pro_name is not null then 'club_pro'
+    , case when transaction_financial_date = first_transaction_date then true else false end as is_first_transaction
+    , case when pro_name is not null then 'club_pro'
       when pro_name is null and is_travel_agent is true then 'travel_agent'
       when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
       when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
       end as b2b_revenue_attrabution
-from finsum_4
+from first_transaction
 ;

@@ -66,8 +66,7 @@ select
 from base_finsum as f
 left outer join mongo_land.micro_sites as m 
   on f.micro_site_id = m._id
-where 
-  m._id not in('62975451141c04016357d2bf', '64088dd9b3a8d901c073cf31','6400d8f4b4046e01cff6b6c5','610bfa7a2c4fc90176f1652f','55e9751dce94aa501750fd49e','55e35349af5ff72330000019','54ecdb77f4825e54fb000012')  
+-- where m._id not in('62975451141c04016357d2bf', '64088dd9b3a8d901c073cf31','6400d8f4b4046e01cff6b6c5','610bfa7a2c4fc90176f1652f','55e9751dce94aa501750fd49e','55e35349af5ff72330000019','54ecdb77f4825e54fb000012')  
 ), travel_referrals as (
 select 
   f.*
@@ -96,9 +95,9 @@ from mongo_land.clubs as c
 join mongo_land.brands as b
   on c.reporting_brand_id = b._id
 where 
-  c.club_id not in('5a95de7535db5c0188001688','54da0c49f4825eb481000033','6218f0600f46db01612acdfa','5879035aaf5ff75f63000092','650327797de1ee01508fc7f6','JAP-01-0162')
-  and c.no_pro is false
+  c.no_pro is false
   and c.user_id <> '<NA>'
+  -- and c.club_id not in('5a95de7535db5c0188001688','54da0c49f4825eb481000033','6218f0600f46db01612acdfa','5879035aaf5ff75f63000092','650327797de1ee01508fc7f6','JAP-01-0162')
 ), clubs as (
 select
   f.*
@@ -122,17 +121,17 @@ left outer join mongo_land.users as u
   on u._id = f.user_id
 ), first_transaction as (
 select 
-    f.*
-    , min(f.transaction_financial_date) over (partition by f.user_id, f.brand) as first_transaction_date
+  f.*
+  , min(f.transaction_financial_date) over (partition by f.user_id, f.brand) as first_transaction_date
 from travel_agent f    
 )
 select 
   *
-    , case when transaction_financial_date = first_transaction_date then true else false end as is_first_transaction
-    , case when pro_name is not null then 'club_pro'
-      when pro_name is null and is_travel_agent is true then 'travel_agent'
-      when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
-      when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
-      end as b2b_revenue_attrabution
+  , case when transaction_financial_date = first_transaction_date then true else false end as is_first_transaction
+  , case when pro_name is not null then 'club_pro'
+    when pro_name is null and is_travel_agent is true then 'travel_agent'
+    when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
+    when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
+    end as b2b_revenue_attrabution
 from first_transaction
 ;

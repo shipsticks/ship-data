@@ -20,14 +20,14 @@ select
   -- dimensions
   , nullif(Brand, '<NA>') as brand
   , nullif(`Brand ID`, '<NA>') as brand_id
-  , `Shipment ID` as shipment_id
+  , nullif(`Shipment ID`,'<NA>') as shipment_id
   , `Transaction ID` as internal_transaction_id
   , transaction_id as transaction_id
   , nullif(`State`, '<NA>') as transaction_reporting_state
   , nullif(`Transaction Type`, '<NA>') as transaction_type
   , nullif(`Transaction State`, '<NA>') as transaction_state
   , `v5 Product Type` as product_type
-  , `v5 Product Full Name` as product_name
+  , nullif(`v5 Product Full Name`,'<NA>') as product_name
   , 'v5 Product ID'  as product_id
   , sku as product_sku
   , Carrier as carrier
@@ -36,6 +36,20 @@ select
   , carrier_service_level_id as carrier_service_level_id
   , nullif(`Carrier Service Level Report Name`,'<NA>') as carrier_service_level_report_name
   , nullif(`Carrier Tracking ID`, '<NA>') as carrier_tracking_id
+  , nullif(`Origination Ship Point Facility Id`,'<NA>') as origination_facility_id
+  , nullif(`Origination Ship Point Company Name`,'<NA>') as origination_company_name
+  , concat(nullif(`Origination Ship Point Delivery Address Line`,'<NA>'),' ', nullif(`Origination Ship Point Delivery Address Line 1`,'<NA>')) as origination_delivery_address
+  , `Origination Ship Point City` as origination_city
+  , `Origination Ship Point State` as orignation_state
+  , `Origination Ship Point Zip5` as origination_zip5
+  , `Origination Ship Point Country Code` as origination_country_code
+  , nullif(`Destination Ship Point Facility Id`,'<NA>') as destination_facility_id
+  , nullif(`Destination Ship Point Company Name`,'<NA>') as destination_company_name
+  , concat(nullif(`Destination Ship Point Delivery Address Line`,'<NA>'), ' ', nullif(`Destination Ship Point Delivery Address Line 1`,'<NA>')) as destination_delivery_address
+  , `Destination Ship Point City` as destination_city
+  , `Destination Ship Point State` as destination_state
+  , `Destination Ship Point Zip5` as destination_zip5
+  , `Destination Ship Point Country Code` as destination_country_code
   , nullif(coupon_id, '<NA>') as coupon_id
   , nullif(`Item Type Temp`, '<NA>') as item_type
   , `Shipment Leg ID` as leg_id

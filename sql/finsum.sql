@@ -11,7 +11,7 @@ select
   , date(`Shipment Created At`) as shipment_created_date
   , datetime(`Shipment Created At Timestamp`) as shipment_created_at
   , date(`Estimated Ship Date`) as shipment_estimated_ship_date
-  , date(`Shipment Actual Delivery`) as shipment_actual_delivery_date 
+  , date(`Shipment Actual Delivery`) as shipment_actual_delivery_date
   , date(`Shipment Estimated Delivery`) as shipment_estimated_delivery_date
   -- metrics
   , `Order Line Item Price Cents` as price_cents

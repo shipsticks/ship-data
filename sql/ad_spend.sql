@@ -93,6 +93,21 @@ select
   , clicks
 from dp_staging.google_ads_spend
 where spend > 0
+
+union all
+
+select
+  spend_date
+  , 'Offline' as channel
+  , source
+  , brand
+  , campaign
+  , null as campaign_name
+  , spend
+  , null as impressions
+  , null as clicks
+from dp_staging.manual_ad_spend
+where spend_date is not null
 )
 select 
   spend_date

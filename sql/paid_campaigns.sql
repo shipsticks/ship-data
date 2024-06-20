@@ -14,7 +14,7 @@ select
   , impressions
   , clicks
 from dp_bi.ad_spend
-where spend_date >= '2024-04-09'    
+where spend_date >= '2024-04-09'
 ), metrics as (
 select
   coalesce(s.brand, u.brand) as brand
@@ -45,17 +45,18 @@ full outer join ad_spend as s
   on s.brand = u.brand
   and s.spend_date = u.attrabtion_date
   and s.source = u.source
-  and s.campaign = u.utm_campaign 
+  and s.campaign = u.utm_campaign
 )
 select 
   *
-  , case 
+  , case
       when source in ('Google') and contains_substr(campaign, 'pmax') then 'Google - Pmax'
       when source in ('Bing','Google') and contains_substr(campaign, '_brand_') then source || ' - ' || 'Brand'
       when source in ('Bing','Google') and not contains_substr(campaign, '_brand_') then source || ' - ' || 'Non-Brand'
-      when source not in ('Organic','Facebook') then 'Other Sources'
+      when source in ('TV', 'Podcast', 'Digital Partnership') then 'Offline'
       when source = 'Bing' and campaign = '10 - Brand - Old' then 'Bing - Brand'
-      else source
+      when source in ('Organic','Facebook') then source
+      else 'Other Sources'
     end as display_source
 from metrics
 order by 1, 2, 3, 4

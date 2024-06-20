@@ -1,6 +1,6 @@
 -- marketing spend data
 drop table if exists dp_staging.google_ads_spend;
-create table if not exists dp_staging.google_ads_spend as 
+create table if not exists dp_staging.google_ads_spend as
 with brand_names as (
 select distinct
   customer_id
@@ -98,7 +98,7 @@ union all
 
 select
   spend_date
-  , 'Offline' as channel
+  , channel
   , source
   , brand
   , campaign
@@ -106,8 +106,7 @@ select
   , spend
   , null as impressions
   , null as clicks
-from dp_staging.manual_ad_spend
-where spend_date is not null
+from dp_staging.manual_ad_spend_snapshot
 )
 select 
   spend_date

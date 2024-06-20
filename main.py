@@ -61,7 +61,7 @@ def finsum_metrics_union() -> None:
 
 
 def discovery_env() -> list[str]:
-    local_files = os.listdir(os.getcwd())       ∫b
+    local_files = os.listdir(os.getcwd())
     logger.info(f"Discovered files: {local_files}")
     return local_files
 

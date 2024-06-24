@@ -11,7 +11,7 @@ select
   , date(`Shipment Created At`) as shipment_created_date
   , datetime(`Shipment Created At Timestamp`) as shipment_created_at
   , date(`Estimated Ship Date`) as shipment_estimated_ship_date
-  , date(`Shipment Actual Delivery`) as shipment_actual_delivery_date
+  , date(`Shipment Actual Delivery`) as shipment_actual_delivery_date 
   , date(`Shipment Estimated Delivery`) as shipment_estimated_delivery_date
   -- metrics
   , `Order Line Item Price Cents` as price_cents
@@ -40,7 +40,7 @@ select
   , nullif(`Origination Ship Point Company Name`,'<NA>') as origination_company_name
   , concat(nullif(`Origination Ship Point Delivery Address Line`,'<NA>'),' ', nullif(`Origination Ship Point Delivery Address Line 1`,'<NA>')) as origination_delivery_address
   , `Origination Ship Point City` as origination_city
-  , `Origination Ship Point State` as orignation_state
+  , `Origination Ship Point State` as origination_state
   , `Origination Ship Point Zip5` as origination_zip5
   , `Origination Ship Point Country Code` as origination_country_code
   , nullif(`Destination Ship Point Facility Id`,'<NA>') as destination_facility_id

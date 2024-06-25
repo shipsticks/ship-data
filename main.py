@@ -3,7 +3,13 @@ from loguru import logger
 from google.cloud import bigquery
 
 GCP_PROJECT = "gse-dw-prod"
-bq_client = bigquery.Client(project=GCP_PROJECT)
+
+bq_client = bigquery.Client(
+    project=GCP_PROJECT, 
+    client_options={
+        "scopes": ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/cloud-platform']
+    })
+
 
 
 def run_sql(sql_file: str = None, sql: str = None) -> None:

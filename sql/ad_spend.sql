@@ -101,12 +101,12 @@ select
   , channel
   , source
   , brand
-  , campaign
+  , null as campaign
   , null as campaign_name
   , spend
   , null as impressions
   , null as clicks
-from dp_staging.manual_ad_spend_snapshot
+from dp_staging.manual_ad_spend
 )
 select 
   spend_date

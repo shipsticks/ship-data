@@ -11,7 +11,6 @@ bq_client = bigquery.Client(
     })
 
 
-
 def run_sql(sql_file: str = None, sql: str = None) -> None:
     working_dir = os.getcwd()
     full_path = working_dir + f"/sql/{sql_file}"

@@ -1,3 +1,4 @@
+# activate service account
 gcloud auth activate-service-account \
     ship-data@gse-dw-prod.iam.gserviceaccount.com \
     --key-file=/Users/bobcolner/shipsticks/dev/gcp_service_account/ship-data/gse-dw-prod-64abcd721f7b.json \
@@ -12,5 +13,13 @@ gcloud auth login --update-adc
 
 gcloud auth application-default login
 
-gcloud run jobs execute daily-tables --region us-east1
+# deploy cloud run
+gcloud run jobs deploy daily-tables \                                                                                                                                             130 ↵
+    --source . \
+    --set-env-vars LOG_LEVEL=DEBUG \
+    --max-retries 0 \
+    --region us-east1 \
+    --project gse-dw-prod
 
+# run cloud run job
+gcloud run jobs execute daily-tables --region us-east1

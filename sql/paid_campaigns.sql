@@ -53,7 +53,7 @@ select
       when source in ('Google') and contains_substr(campaign, 'pmax') then 'Google - Pmax'
       when source in ('Bing','Google') and contains_substr(campaign, '_brand_') then source || ' - ' || 'Brand'
       when source in ('Bing','Google') and not contains_substr(campaign, '_brand_') then source || ' - ' || 'Non-Brand'
-      when source in ('Golf TV', 'Subpar', 'NGF') then 'Offline'
+      when source = 'Offline' then 'Offline'
       when source = 'Bing' and campaign = '10 - Brand - Old' then 'Bing - Brand'
       when source in ('Organic','Facebook') then source
       else 'Other Sources'

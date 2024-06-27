@@ -98,8 +98,8 @@ union all
 
 select
   spend_date
-  , channel
-  , source
+  , 'Offline' as channel
+  , 'Offline' as source
   , brand
   , null as campaign
   , null as campaign_name
@@ -107,6 +107,7 @@ select
   , null as impressions
   , null as clicks
 from dp_staging.manual_ad_spend
+where spend > 0
 )
 select 
   spend_date

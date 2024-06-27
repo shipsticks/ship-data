@@ -9,8 +9,10 @@ gcloud auth activate-service-account \
     --key-file=/Users/bobcolner/shipsticks/dev/gcp_service_account/mode/gse-dw-prod-4ce934ed9a0f.json \
     --project=gse-dw-prod
 
+# login to both user and service account (from env var)
 gcloud auth login --update-adc
 
+# login to user accout for sdk
 gcloud auth application-default login
 
 # deploy cloud run

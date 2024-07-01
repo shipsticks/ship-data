@@ -126,6 +126,7 @@ select
 from travel_referrals as f
 left outer join club_pros as p 
   on p.user_id = f.user_id
+        and (p.club_id = f.origination_facility_id or p.club_id = f.destination_facility_id)
 ), travel_agent as (
 select
   f.*
@@ -146,6 +147,6 @@ select
     when pro_name is null and is_travel_agent is true then 'travel_agent'
     when (pro_name is null) and (is_travel_agent is not true) and (micro_site is not null) then 'micro_site'
     when (pro_name is null) and (is_travel_agent is not true) and (micro_site is null) and travel_referral is not null then 'travel_referral'
-    end as b2b_revenue_attrabution
+    end as b2b_revenue_attribution
 from first_transaction
 ;

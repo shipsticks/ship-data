@@ -23,6 +23,7 @@ select
   , sum(ltv_day14) as revenue_day14
   , sum(ltv_day30) as revenue_day30
   , sum(ltv_day60) as revenue_day60
+  , sum(ltv_day90) as revenue_day90
   , sum(ltv_full) as revenue_total
 from dp_bi.prospects
 where 

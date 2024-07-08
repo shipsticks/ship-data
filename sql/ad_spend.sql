@@ -120,6 +120,8 @@ select
   , if(spend_date >= date_sub(current_date(), interval 7 day), null, spend) as spend_day7
   , if(spend_date >= date_sub(current_date(), interval 14 day), null, spend) as spend_day14
   , if(spend_date >= date_sub(current_date(), interval 30 day), null, spend) as spend_day30
+  , if(spend_date >= date_sub(current_date(), interval 60 day), null, spend) as spend_day60
+  , if(spend_date >= date_sub(current_date(), interval 90 day), null, spend) as spend_day90
   , impressions
   , clicks
 from source_spend

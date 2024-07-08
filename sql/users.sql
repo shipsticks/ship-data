@@ -303,7 +303,7 @@ select
   , avg(year1_ltv) as year1_ltv 
   , avg(year2_ltv) as year2_ltv 
   , avg(year3_ltv) as year3_ltv 
-from `gse-dw-prod.adhoc.user_ltv` 
+from `gse-dw-prod.adhoc.user_ltv`
 where 
   is_pro = false
   and club_name is not null

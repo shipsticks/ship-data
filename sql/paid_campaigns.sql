@@ -11,6 +11,8 @@ select
   , spend_day7
   , spend_day14
   , spend_day30
+  , spend_day60
+  , spend_day90
   , impressions
   , clicks
 from dp_bi.ad_spend
@@ -25,6 +27,8 @@ select
   , s.spend_day7
   , s.spend_day14
   , s.spend_day30
+  , s.spend_day60
+  , s.spend_day90
   , s.impressions
   , s.clicks
   , u.prospects
@@ -39,6 +43,8 @@ select
   , u.revenue_day7
   , u.revenue_day14 
   , u.revenue_day30
+  , u.revenue_day60
+  , u.revenue_day90
   , u.revenue_total
 from dp_bi.utm_campaigns as u
 full outer join ad_spend as s

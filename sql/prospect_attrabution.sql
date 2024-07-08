@@ -267,6 +267,9 @@ select
           and f.`Shipment Created At` <= date_add(date(u.attrabtion_at), interval 60 day) 
           then f.price_cents else 0 end) / 100 as ltv_day60
   , sum(case when f.`Shipment Created At` >= date(u.attrabtion_at)
+          and f.`Shipment Created At` <= date_add(date(u.attrabtion_at), interval 90 day) 
+          then f.price_cents else 0 end) / 100 as ltv_day90
+  , sum(case when f.`Shipment Created At` >= date(u.attrabtion_at)
           then f.price_cents else 0 end) / 100 as ltv_full
 from dp_staging.att_5 as u
 left outer join `bi.financial_summary_detail_v5` as f
@@ -275,10 +278,11 @@ left outer join `bi.financial_summary_detail_v5` as f
 group by all
 )
 select 
-  * except (ltv_day7, ltv_day14, ltv_day30, ltv_day60)
+  * except (ltv_day7, ltv_day14, ltv_day30, ltv_day60, ltv_day90)
   , if(user_created_at >= timestamp_sub(current_timestamp(), interval 7 day), null, ltv_day7) as ltv_day7
   , if(user_created_at >= timestamp_sub(current_timestamp(), interval 14 day), null, ltv_day14) as ltv_day14
   , if(user_created_at >= timestamp_sub(current_timestamp(), interval 30 day), null, ltv_day30) as ltv_day30
   , if(user_created_at >= timestamp_sub(current_timestamp(), interval 60 day), null, ltv_day60) as ltv_day60
+  , if(user_created_at >= timestamp_sub(current_timestamp(), interval 90 day), null, ltv_day60) as ltv_day90
 from tmp
 ;

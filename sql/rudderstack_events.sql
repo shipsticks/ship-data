@@ -29,6 +29,7 @@ select
   , context_campaign_medium as utm_medium
   , context_campaign_source as utm_source
   , context_campaign_name as utm_campaign
+  , context_campaign_term as utm_term
 from `gse-dw-prod.rudderstack_prod_land.pages`
 -- where
 --   date(_PARTITIONTIME) between date_sub(current_date(), INTERVAL 10 day) and current_date()
@@ -54,6 +55,7 @@ select
   , context_campaign_medium as utm_medium
   , context_campaign_source as utm_source
   , context_campaign_name as utm_campaign
+  , context_campaign_term as utm_term
 from `gse-dw-prod.rudderstack_prod_land.tracks`
 where
   event not in ('select_service_level','purchase','generate_lead')
@@ -80,6 +82,7 @@ select
   , cast(null as string) as utm_medium
   , cast(null as string) as utm_source
   , cast(null as string) as utm_campaign
+  , cast(null as string) as utm_term
 from `gse-dw-prod.rudderstack_prod_land.purchase`
 -- where
   -- and date(_PARTITIONTIME) between date_sub(current_date(), INTERVAL 10 day) and current_date()
@@ -105,6 +108,7 @@ select
   , cast(null as string) as utm_medium
   , cast(null as string) as utm_source
   , cast(null as string) as utm_campaign
+  , cast(null as string) as utm_term
 from `gse-dw-prod.rudderstack_prod_land.generate_lead`
 -- where
   -- and date(_PARTITIONTIME) between date_sub(current_date(), INTERVAL 10 day) and current_date()

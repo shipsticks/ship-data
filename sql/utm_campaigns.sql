@@ -8,6 +8,7 @@ select
   , utm_medium
   , utm_source
   , utm_campaign
+  , utm_term
   -- funnel 
   , count(1) as prospects
   , count(first_generate_lead_at) as leads

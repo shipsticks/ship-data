@@ -51,7 +51,7 @@ select
 from `dp_bi.finsum`
 where 
   user_is_pro = true
---   and traveler_email is not null
+  and traveler_email is not null
 group by all
 )
 select
@@ -88,7 +88,7 @@ create table if not exists adhoc.traveler_ltv_2 as
 with tmp as (
 select
   brand
-  , user_id 
+  , user_id
   , min(transaction_action_date) as first_purchase_date
   , count(distinct shipment_id) as total_shipments
   , sum(price_cents) / 100 as total_revenue
@@ -161,5 +161,6 @@ from `dp_bi.finsum` as f
 join tmp as u
   on f.brand = u.brand
   and f.traveler_id = u.traveler_id
+where f.user_is_pro = true  
 group by all
 ;

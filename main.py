@@ -78,6 +78,7 @@ def run_workflow() -> None:
     run_sql("prospect_attrabution.sql")
     run_sql("utm_campaigns.sql")
     run_sql("paid_campaigns.sql")
+    run_sql("google_adgroups.sql")
     run_sql("users.sql")
     run_sql("finsum.sql")
     run_sql("finsum_metrics.sql")

@@ -1,6 +1,6 @@
 -- get anon first event at and userid created at
-drop table if exists dp_staging.att_0;
-create table if not exists dp_staging.att_0 as
+drop table if exists dp_staging.term_0;
+create table if not exists dp_staging.term_0 as
 with tmp1 as (
 select
   anonymous_id
@@ -36,8 +36,8 @@ left outer join mongo_land.users as u
 ;
 
 -- also join on email to get user-id for lead-gen conversion
-drop table if exists dp_staging.att_1;
-create table if not exists dp_staging.att_1 as
+drop table if exists dp_staging.term_1;
+create table if not exists dp_staging.term_1 as
 with email as (
 select
   a.anonymous_id
@@ -49,7 +49,7 @@ select
   , 'email_conversion' as user_conversion_type
   , u.segment_user_profile_is_admin as is_admin
   , u.segment_user_profile_is_pro as is_pro
-from dp_staging.att_0 as a
+from dp_staging.term_0 as a
 join mongo_land.users as u
   on a.user_email = u.email
 ), tmp2 as (
@@ -76,7 +76,7 @@ select
   , a.first_purchase_at
   , a.total_rs_revenue
   , coalesce(a.user_conversion_type, e.user_conversion_type) as user_conversion_type
-from dp_staging.att_0 as a
+from dp_staging.term_0 as a
 left outer join email as e
   on a.anonymous_id = e.anonymous_id
   and a.brand = e.brand
@@ -96,8 +96,8 @@ where user_type <> 'user-created-pre-rudder'
 
 
 -- add first touch attrabution
-drop table if exists dp_staging.att_2;
-create table if not exists dp_staging.att_2 as
+drop table if exists dp_staging.term_2;
+create table if not exists dp_staging.term_2 as
 select
   e.anonymous_id
   , s.brand
@@ -106,9 +106,10 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
+  , e.utm_term
   , e.url as landing_page
   , min(e.timestamp_utc) as attrabtion_at
-from dp_staging.att_1 as s
+from dp_staging.term_1 as s
 join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
   and date(e.timestamp_utc) between date(s.first_event_at) and date(s.user_created_at)
@@ -128,9 +129,10 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
+  , e.utm_term
   , e.url as landing_page
   , min(e.timestamp_utc) as attrabtion_at
-from dp_staging.att_1 as s
+from dp_staging.term_1 as s
 join dp_bi.rudderstack_events as e
   on s.anonymous_id = e.anonymous_id
 where
@@ -142,8 +144,8 @@ qualify row_number() over (partition by e.anonymous_id, s.brand order by min(e.t
 
 
 -- add organic prospects/users
-drop table if exists dp_staging.att_3;
-create table if not exists dp_staging.att_3 as
+drop table if exists dp_staging.term_3;
+create table if not exists dp_staging.term_3 as
 select 
   s.anonymous_id
   , s.brand
@@ -153,17 +155,18 @@ select
   , a.utm_medium
   , a.utm_source
   , a.utm_campaign
+  , a.utm_term
   , a.landing_page
-from dp_staging.att_1 as s
-left outer join dp_staging.att_2 as a
+from dp_staging.term_1 as s
+left outer join dp_staging.term_2 as a
   on s.anonymous_id = a.anonymous_id
   and s.brand = a.brand
 ;
 
 
 -- merge event coversion and attrabution
-drop table if exists dp_staging.att_4;
-create table if not exists dp_staging.att_4 as
+drop table if exists dp_staging.term_4;
+create table if not exists dp_staging.term_4 as
 select 
   a.*
   , b.attrabtion_at
@@ -172,27 +175,28 @@ select
   , b.utm_medium
   , b.utm_source
   , b.utm_campaign
+  , b.utm_term
   , b.landing_page
-from dp_staging.att_1 as a
-join dp_staging.att_3 as b
+from dp_staging.term_1 as a
+join dp_staging.term_3 as b
   on a.anonymous_id = b.anonymous_id
   and a.brand = b.brand
 ;
 
 
 -- dedup users with multiple anonymous_ids, use first non-organic anon if present.
-drop table if exists dp_staging.att_5;
-create table if not exists dp_staging.att_5 as
+drop table if exists dp_staging.term_5;
+create table if not exists dp_staging.term_5 as
 with paid_anons as (
 select *
-from dp_staging.att_4
+from dp_staging.term_4
 where 
   user_id is not null
   and source <> 'Organic'
 qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
 ), all_anons as (
 select *
-from dp_staging.att_4
+from dp_staging.term_4
 where 
   user_id is not null
 qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
@@ -229,6 +233,7 @@ select
   , coalesce(p.utm_medium, a.utm_medium) as utm_medium
   , coalesce(p.utm_source, a.utm_source) as utm_source
   , coalesce(p.utm_campaign, a.utm_campaign) as utm_campaign
+  , coalesce(p.utm_term, a.utm_term) as utm_term
   , coalesce(p.landing_page, a.landing_page) as landing_page
 from all_anons as a
 left outer join paid_anons as p
@@ -241,14 +246,14 @@ from users
 union all
 
 select *
-from `dp_staging.att_4`
+from `dp_staging.term_4`
 where user_id is null
 ;
 
 
 -- add user LTV
-drop table if exists dp_bi.prospects;
-create table if not exists dp_bi.prospects as
+drop table if exists dp_bi.prospects_term;
+create table if not exists dp_bi.prospects_term as
 with tmp as (
 select
   u.*
@@ -271,7 +276,7 @@ select
           then f.price_cents else 0 end) / 100 as ltv_day90
   , sum(case when f.`Shipment Created At` >= date(u.attrabtion_at)
           then f.price_cents else 0 end) / 100 as ltv_full
-from dp_staging.att_5 as u
+from dp_staging.term_5 as u
 left outer join `bi.financial_summary_detail_v5` as f
   on u.user_id = f.user_id
   and f.`Brand` = u.brand

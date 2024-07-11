@@ -13,8 +13,7 @@ select distinct
   , sum(price_cents) / 100 as total_revenue
 
   , ((sum(case when product_type = 'V5::Label' and transaction_reporting_state = 'enqueued' then price_cents else 0 end) +
-      sum(case when product_type = 'V5::Label' and transaction_reporting_state = 'cancelled' then price_cents else 0  end)) / 100) +
-      (sum(case when product_type = 'V5::Fee' then price_cents else 0 end) / 100) as item_revenue
+      sum(case when product_type = 'V5::Label' and transaction_reporting_state = 'cancelled' then price_cents else 0  end)) / 100) as item_revenue
 
   , sum(case when product_type = 'V5::Insurance' then price_cents else 0 end) / 100 as insurance_revenue
 

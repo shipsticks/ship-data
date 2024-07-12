@@ -58,7 +58,7 @@ def finsum_metrics_union() -> None:
     as
     select * from dp_staging_finsum.metrics_transaction_financial_date
     union all
-    select * from dp_staging_finsum.metrics_shipment_created_date
+    select * from dp_staging_finsum.metrics_shipment_estimated_delivery_date
     union all
     select * from dp_staging_finsum.metrics_shipment_actual_delivery_date
     '''
@@ -86,7 +86,7 @@ def run_workflow() -> None:
         sql_file="template_finsum_metrics.sql",
         params=[
             {"report_date": "transaction_financial_date"},
-            {"report_date": "shipment_created_date"},
+            {"report_date": "shipment_estimated_delivery_date"},
             {"report_date": "shipment_actual_delivery_date"},
         ],
     )

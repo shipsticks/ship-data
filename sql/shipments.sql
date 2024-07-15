@@ -1,5 +1,5 @@
---drop table if exists dp_bi.shipments;
---create table if not exists dp_bi.shipments as
+drop table if exists dp_bi.shipments;
+create table if not exists dp_bi.shipments as
 --with base_shipments as (
 select 
     -- dates

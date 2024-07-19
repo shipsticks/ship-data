@@ -81,7 +81,6 @@ def run_workflow() -> None:
     run_sql("google_adgroups.sql")
     run_sql("users.sql")
     run_sql("finsum.sql")
-    run_sql("finsum_metrics.sql")
     template_sql(
         sql_file="template_finsum_metrics.sql",
         params=[

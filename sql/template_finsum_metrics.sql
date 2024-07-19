@@ -1,5 +1,5 @@
-drop table if exists dp_bi.metrics_{report_date};
-create or replace table dp_bi.metrics_{report_date} as
+drop table if exists dp_staging_finsum.metrics_{report_date};
+create or replace table dp_staging_finsum.metrics_{report_date} as
 select distinct
  brand
   , carrier

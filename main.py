@@ -53,8 +53,8 @@ def template_sql(sql_file: str, params: list[dict]) -> None:
 
 def finsum_metrics_union() -> None:
     sql = '''
-    drop table if exists dp_staging_finsum.finsum_metrics;
-    create table if not exists dp_staging_finsum.finsum_metrics 
+    drop table if exists dp_bi.finsum_metrics;
+    create table if not exists dp_bi.finsum_metrics 
     as
     select * from dp_staging_finsum.metrics_transaction_financial_date
     union all

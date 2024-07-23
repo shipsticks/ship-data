@@ -176,7 +176,6 @@ select
   , g.user_geo
   , gs.user_state
   , gz.user_zip
-  , sum(f.price_cents) / 100 as full_ltv
   , sum(case when f.`Shipment Created At` >= date(u.user_created_at)
           and f.`Shipment Created At` < date_add(date(u.user_created_at), interval 7 day) 
           then f.price_cents else 0 end) / 100 as day7_ltv

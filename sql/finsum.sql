@@ -1,7 +1,6 @@
 drop table if exists `dp_bi.finsum`; 
 create or replace table `dp_bi.finsum`
 partition by date_trunc(transaction_financial_date, month) as
-with base_finsum as (
   select
     -- dates
       date(`Transaction Date - Financial`) as transaction_financial_date
@@ -72,11 +71,14 @@ with base_finsum as (
     , `User is Admin` as user_is_admin
     , `User is Pro` as user_is_pro
   from bi.financial_summary_detail_v5
-), 
+;
 
+drop table if exists `dp_bi.finsum_b2b`; 
+create or replace table `dp_bi.finsum_b2b`
+partition by date_trunc(transaction_financial_date, month) as
 --Begin Clubs
 --gathering club pro information
-club_pros as (  
+with club_pros as (  
   select
       club_id
     , c.name as club_name
@@ -108,7 +110,7 @@ clubs as (
     , p.ship_to_address_state
     , p.pro_name
     , p.facility_type
-  from base_finsum as f
+  from `dp_bi.finsum` as f
   left outer join club_pros as p 
     on p.user_id = f.user_id 
   group by all
@@ -142,16 +144,16 @@ clubs_max as (
       f.*
     , (select max_club_id from mult_club_users where mult_club_users.user_id = f.user_id) as final_club_id
   from clubs f
-  where f.user_id in (select user_id from mult_club_users)
-    and (f.origination_facility_id is null and f.destination_facility_id is null)
+  where (f.user_id in (select user_id from mult_club_users)
+    and (club_id <> origination_facility_id or club_id <> destination_facility_id))
 ),
 
 --final step, union the filtered and max club results.
 clubs_final as (
   select * from filtered_clubs
   union all
-  select * from clubs_max cm
-  where cm.final_club_id = cm.club_id
+  (select * from clubs_max cm
+  where cm.final_club_id = cm.club_id)
 ),
 -- End Clubs
 

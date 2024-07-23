@@ -73,14 +73,14 @@ def discovery_env() -> list[str]:
 
 def run_workflow() -> None:
     discovery_env()
+    run_sql("finsum.sql")
     run_sql("rudderstack_events.sql")
     run_sql("ad_spend.sql")
     run_sql("prospect_attrabution.sql")
     run_sql("prospect_attrabution_term.sql")
     run_sql("utm_campaigns.sql")
     run_sql("google_adgroups.sql")
-    run_sql("users.sql")
-    run_sql("finsum.sql")
+    run_sql("users.sql")    
     template_sql(
         sql_file="template_finsum_metrics.sql",
         params=[

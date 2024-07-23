@@ -4,7 +4,7 @@ with tmp as (
 select
   brand
   , user_id
-  , min(transaction_action_date) as first_purchase_date
+  , min(transaction_financial_date) as first_purchase_date
   , count(distinct shipment_id) as total_shipments
   , sum(price_cents) / 100 as total_revenue
 from `dp_bi.finsum`
@@ -43,19 +43,34 @@ create table if not exists adhoc.traveler_ltv as
 with tmp as (
 select
   brand
-  , traveler_email
-  , min(transaction_action_date) as first_purchase_date
+  , d.dlink_pid
+  , max(user_is_pro) as is_pro
+  , max(If(user_is_pro is false, true, false)) as is_dtc
+  , If(Count(DISTINCT user_is_pro) > 1, true, false) as is_pro_dtc
+  , min(shipment_created_date) as first_purchase_date
   , count(distinct shipment_id) as total_shipments
   , sum(price_cents) / 100 as total_revenue
-from `dp_bi.finsum`
-where 
-  -- user_is_pro = true
-  traveler_email is not null
+from `dp_bi.finsum` as f
+join `ltv.ltv_dlink` as d
+  on f.traveler_email = d.TRAVELER_EMAIL
+  and f.traveler_name = d.TRAVELER_NAME
+-- where
+  -- f.transaction_financial_date >= '2024-01-01'
 group by all
+), tmp2 as (
+select
+  *
+  , case when is_pro_dtc is true then 'pro_dtc'
+      when is_pro is true then 'pro'
+      when is_dtc is true then 'dtc'
+    end as user_type
+from tmp
 )
 select
   u.brand
-  , u.traveler_email
+  -- , u.traveler_email
+  , d.dlink_pid
+  , u.user_type
   , u.first_purchase_date
   , u.total_shipments
   , u.total_revenue
@@ -72,11 +87,13 @@ select
           and f.shipment_created_date < date_add(date(u.first_purchase_date), interval 3 year)
           then f.price_cents else 0 end) / 100 as ltv_year3
 from `dp_bi.finsum` as f
-join tmp as u
-  on f.brand = u.brand
-  and f.traveler_email = u.traveler_email
-where 
-  f.traveler_email is not null
-  -- and f.user_is_pro = true
+join `ltv.ltv_dlink` as d
+  on f.traveler_email = d.TRAVELER_EMAIL
+  and f.traveler_name = d.TRAVELER_NAME
+join tmp2 as u
+  on d.dlink_pid = u.dlink_pid
+-- where 
+  -- f.traveler_email is not null
+  -- and f.brand = 'Ship Sticks'
 group by all
 ;

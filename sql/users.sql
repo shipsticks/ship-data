@@ -176,6 +176,7 @@ select
   , g.user_geo
   , gs.user_state
   , gz.user_zip
+  , sum(f.price_cents) / 100 as full_ltv
   , sum(case when f.`Shipment Created At` >= date(u.user_created_at)
           and f.`Shipment Created At` < date_add(date(u.user_created_at), interval 7 day) 
           then f.price_cents else 0 end) / 100 as day7_ltv
@@ -210,7 +211,7 @@ select
           then f.price_cents else 0 end) / 100 as full_ltv
 from users as u
 left outer join bi.financial_summary_detail_v5 as f
-  on f.user_id = u.user_id 
+  on f.user_id = u.user_id
     and f.`Brand` = u.brand
 left outer join adhoc.user_geo as g
   on u.user_id = g.user_id

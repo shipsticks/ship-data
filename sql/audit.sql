@@ -35,6 +35,12 @@ select
 from dp_staging.att_5
 union all
 select
+  'att6'
+  , count(1) as anon
+  , count(distinct user_id) as users
+from dp_staging.att_6
+union all
+select
   'prospects'
   , count(1) as anon
   , count(distinct user_id) as users

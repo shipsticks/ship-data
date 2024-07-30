@@ -27,6 +27,7 @@ select
   a.*
   , u.created_at as user_created_at
   , registration_domain
+  -- , if(a.user_id is not null, 'cookie_conversion', 'no_conversion') as user_conversion_type
   , segment_user_profile_is_admin as is_admin
   , segment_user_profile_is_pro as is_pro
 from tmp1 as a
@@ -52,7 +53,7 @@ select
 from dp_staging.att_0 as a
 join mongo_land.users as u
   on a.user_email = u.email
-), tmp1 as (
+), tmp2 as (
 select
   a.anonymous_id
   , a.brand
@@ -75,25 +76,23 @@ select
   , a.first_begin_checkout_at
   , a.first_purchase_at
   , a.total_rs_revenue
-    , case when a.user_id is not null then 'cookie'
-        when a.user_id is null and e.user_id is not null then 'email'
-        when a.user_id is null and e.user_id is null then 'none'
-        end as user_conversion_type
+  -- , coalesce(a.user_conversion_type, e.user_conversion_type) as user_conversion_type
+  , coalesce('cookie_conversion', e.user_conversion_type) as user_conversion_type
 from dp_staging.att_0 as a
 left outer join email as e
   on a.anonymous_id = e.anonymous_id
   and a.brand = e.brand
-), tmp2 as (
+), tmp3 as (
 select 
   *
   , case when (first_event_at > user_created_at and user_id is not null) then 'user-created-pre-rudder'
       when (first_event_at <= user_created_at and user_id is not null) then 'user-created-post-rudder'
       when user_id is null then 'prospect'
     end as user_type
-from tmp1
+from tmp2
 )
 select *
-from tmp2
+from tmp3
 where user_type <> 'user-created-pre-rudder'
 ;
 
@@ -183,82 +182,19 @@ join dp_staging.att_3 as b
 ;
 
 
-drop table if exists dp_staging.att_4b;
-create table if not exists dp_staging.att_4b as
-with missing_users as (
-select 
-  u._id as user_id
-  , u.created_at as user_created_at
-  , case when u.registration_domain = 'shipsticks' then 'Ship Sticks'
-      when u.registration_domain = 'shipskis' then 'Ship Skis'
-      when u.registration_domain = 'shipgo' then 'ShipGo'
-      when u.registration_domain = 'luggagefree' then 'Luggage Free'
-      when u.registration_domain = 'shipcamps' then 'Ship Camps'
-      when u.registration_domain = 'shipplay' then 'Ship & Play'
-      when u.registration_domain = 'shipschools' then 'Ship School'
-    end as brand
-  , u.registration_domain
-  , u.email as user_email
-  , u.segment_user_profile_is_pro as is_pro
-  , u.segment_user_profile_is_admin as is_admin
-from `mongo_land.users` as u
-where 
-  u.created_at >= '2024-04-09'
-  and u._id not in (select user_id from dp_staging.att_5 where user_id is not null)
-)
-select *
-from dp_staging.att_4
-
-union all
-
-select 
-  'mongo_user_backfill' as anonymous_id
-  , brand
-  , 1 as unq_users
-  , user_id
-  , user_created_at
-  , user_email
-  , registration_domain
-  , is_admin
-  , is_pro
-  , 0 as unq_att_noemail_source
-  , 0 as unq_att_paid_source
-  , null as first_event_at
-  , null as first_login_at
-  , null as first_user_id_at
-  , null as first_sign_up_at
-  , null as first_generate_lead_at
-  , null as first_quote_at
-  , null as first_start_shipping_at
-  , null as first_begin_checkout_at
-  , null as first_purchase_at
-  , null as total_rs_revenue
-  , 'mongo_backfill' as user_conversion_type
-  , 'user-created-post-rudder' as user_type
-  , user_created_at as attrabtion_at
-  , 'Organic' as channel
-  , 'Organic' as source
-  , 'Organic' as utm_medium
-  , 'Organic' as utm_source
-  , null as utm_campaign
-  , null as landing_page
-  from missing_users
-;
-
-
 -- dedup users with multiple anonymous_ids, use first non-organic anon if present.
 drop table if exists dp_staging.att_5;
 create table if not exists dp_staging.att_5 as
 with paid_anons as (
 select *
-from dp_staging.att_4b
+from dp_staging.att_4
 where 
   user_id is not null
   and source <> 'Organic'
 qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
 ), all_anons as (
 select *
-from dp_staging.att_4b
+from dp_staging.att_4
 where 
   user_id is not null
 qualify row_number() over(partition by brand, user_id order by first_event_at) = 1
@@ -307,10 +243,72 @@ from users
 union all
 
 select *
-from dp_staging.att_4b
+from dp_staging.att_4
 where user_id is null
 ;
 
+
+drop table if exists dp_staging.att_6;
+create table if not exists dp_staging.att_6 as
+with missing_users as (
+select 
+  u._id as user_id
+  , u.created_at as user_created_at
+  , case when u.registration_domain = 'shipsticks' then 'Ship Sticks'
+      when u.registration_domain = 'shipskis' then 'Ship Skis'
+      when u.registration_domain = 'shipgo' then 'ShipGo'
+      when u.registration_domain = 'luggagefree' then 'Luggage Free'
+      when u.registration_domain = 'shipcamps' then 'Ship Camps'
+      when u.registration_domain = 'shipplay' then 'Ship & Play'
+      when u.registration_domain = 'shipschools' then 'Ship School'
+    end as brand
+  , u.registration_domain
+  , u.email as user_email
+  , u.segment_user_profile_is_pro as is_pro
+  , u.segment_user_profile_is_admin as is_admin
+from `mongo_land.users` as u
+where 
+  u.created_at >= '2024-04-09'
+  and u._id not in (select user_id from dp_staging.att_5 where user_id is not null)
+)
+select *
+from dp_staging.att_5
+
+union all
+
+select 
+  null as anonymous_id
+  , brand
+  , 1 as unq_users
+  , user_id
+  , user_created_at
+  , user_email
+  , registration_domain
+  , is_admin
+  , is_pro
+  , 0 as unq_att_noemail_source
+  , 0 as unq_att_paid_source
+  , null as first_event_at
+  , null as first_login_at
+  , null as first_user_id_at
+  , null as first_sign_up_at
+  , null as first_generate_lead_at
+  , null as first_quote_at
+  , null as first_start_shipping_at
+  , null as first_begin_checkout_at
+  , null as first_purchase_at
+  , null as total_rs_revenue
+  , 'mongo_backfill' as user_conversion_type
+  , 'user-created-post-rudder' as user_type
+  , user_created_at as attrabtion_at
+  , 'Organic' as channel
+  , 'Organic' as source
+  , 'Organic' as utm_medium
+  , 'Organic' as utm_source
+  , null as utm_campaign
+  , null as landing_page
+  from missing_users
+;
 
 -- add user LTV
 drop table if exists dp_bi.prospects;

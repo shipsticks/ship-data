@@ -27,7 +27,7 @@ partition by date_trunc(transaction_financial_date, month) as
     , nullif(`Transaction State`, '<NA>') as transaction_state
     , `v5 Product Type` as product_type
     , nullif(`v5 Product Full Name`, '<NA>') as product_name
-    , 'v5 Product ID' as product_id
+    , `v5 Product ID` as product_id
     , sku as product_sku
     , Carrier as carrier
     , carrier_id

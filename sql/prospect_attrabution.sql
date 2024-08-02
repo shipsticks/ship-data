@@ -182,7 +182,7 @@ join dp_staging.att_3 as b
   and a.brand = b.brand
 ;
 
-
+-- backfill missing user-ids from mongo
 drop table if exists dp_staging.att_4b;
 create table if not exists dp_staging.att_4b as
 with missing_users as (

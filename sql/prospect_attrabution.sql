@@ -109,6 +109,7 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
+  , e.utm_term
   , e.url as landing_page
   , min(e.timestamp_utc) as attrabtion_at
 from dp_staging.att_1 as s
@@ -131,6 +132,7 @@ select
   , e.utm_medium
   , e.utm_source
   , e.utm_campaign
+  , e.utm_term
   , e.url as landing_page
   , min(e.timestamp_utc) as attrabtion_at
 from dp_staging.att_1 as s
@@ -156,6 +158,7 @@ select
   , a.utm_medium
   , a.utm_source
   , a.utm_campaign
+  , e.utm_term
   , a.landing_page
 from dp_staging.att_1 as s
 left outer join dp_staging.att_2 as a
@@ -175,6 +178,7 @@ select
   , b.utm_medium
   , b.utm_source
   , b.utm_campaign
+  , e.utm_term
   , b.landing_page
 from dp_staging.att_1 as a
 join dp_staging.att_3 as b
@@ -241,6 +245,7 @@ select
   , 'Organic' as utm_medium
   , 'Organic' as utm_source
   , null as utm_campaign
+  , null as utm_term
   , null as landing_page
   from missing_users
 ;
@@ -295,6 +300,7 @@ select
   , coalesce(p.utm_medium, a.utm_medium) as utm_medium
   , coalesce(p.utm_source, a.utm_source) as utm_source
   , coalesce(p.utm_campaign, a.utm_campaign) as utm_campaign
+  , coalesce(p.utm_term, a.utm_term) as utm_term
   , coalesce(p.landing_page, a.landing_page) as landing_page
 from all_anons as a
 left outer join paid_anons as p

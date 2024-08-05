@@ -143,13 +143,13 @@ from finsum
 group by all  
 having sum(price_cents) > 0
 qualify row_number() over (partition by brand, dlink_pid order by first_order_at) = 1
-)
+), tmp2 as (
 select
   u.brand
   , u.dlink_pid
-  -- , u.user_is_pro
-  , if(u.b2b_revenue_attribution is not null, 'PRO', 'DTC') as user_type
-  , min(u.first_order_at) as first_order_at
+  -- , if(u.b2b_revenue_attribution is not null, 'B2B', 'DTC') as source
+  , if(u.b2b_revenue_attribution is null, 'DTC', u.b2b_revenue_attribution) as source
+  , min(datetime(u.first_order_at)) as first_order_at
   , sum(case when f.shipment_created_at >= date(u.first_order_at)
           and f.shipment_created_at < date_add(date(u.first_order_at), interval 1 year)
           then f.price_cents else 0 end) / 100 as ltv_year1
@@ -167,8 +167,22 @@ select
           then f.price_cents else 0 end) / 100 as ltv_year5   
   , sum(if(f.shipment_created_at >= date(u.first_order_at), f.price_cents, 0)) / 100 as ltv_total
 from finsum as f
-join tmp1 as u
+join tmp1 as u  
   on f.dlink_pid = u.dlink_pid
   and f.brand = u.brand
 group by all  
+)
+-- select * from tmp2
+-- ;
+select
+  brand
+  , source
+  , first_order_at
+  , if(first_order_at >= datetime_sub(current_datetime(), interval 1 year), null, ltv_year1) as ltv_year1
+  , if(first_order_at >= datetime_sub(current_datetime(), interval 2 year), null, ltv_year2) as ltv_year2
+  , if(first_order_at >= datetime_sub(current_datetime(), interval 3 year), null, ltv_year3) as ltv_year3
+  , if(first_order_at >= datetime_sub(current_datetime(), interval 4 year), null, ltv_year4) as ltv_year4
+  , if(first_order_at >= datetime_sub(current_datetime(), interval 5 year), null, ltv_year5) as ltv_year5
+  , ltv_total
+from tmp2
 ;

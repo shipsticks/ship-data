@@ -3,10 +3,7 @@ create table if not exists dp_bi.utm_campaigns as
 select
   brand
   , date(attrabtion_at) as attrabtion_date
-  -- , channel
   , source
-  -- , utm_medium
-  -- , utm_source
   , utm_campaign
   -- funnel 
   , count(1) as prospects
@@ -59,8 +56,6 @@ select
   , coalesce(s.spend_date, u.attrabtion_date) as event_date
   , coalesce(s.source, u.source) as source
   , coalesce(s.campaign_name, u.utm_campaign) as campaign
-  -- , u.utm_medium
-  -- , u.channel
   , s.spend
   , s.spend_day7
   , s.spend_day14

@@ -228,183 +228,183 @@ select * from dp_bi.users
 ;
 
 
-drop table if exists adhoc.geo_ltv;
-create table if not exists adhoc.geo_ltv as
-select
-  brand
-  , user_geo
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv 
-  , avg(year2_ltv) as year2_ltv 
-  , avg(year3_ltv) as year3_ltv 
-from `gse-dw-prod.adhoc.user_ltv` 
-where 
-  is_pro = false
-  and user_geo is not null
-group by all
-having total_users > 50
-order by 1, 3 desc
-;
-
-drop table if exists adhoc.state_ltv;
-create table if not exists adhoc.state_ltv as
-select
-  brand
-  , user_state
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv
-  , avg(year2_ltv) as year2_ltv
-  , avg(year3_ltv) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where
-  is_pro = false
-  and user_state is not null
-group by all
-having total_users > 50
-order by 1, 3 desc
-;
-
-drop table if exists adhoc.zip_ltv;
-create table if not exists adhoc.zip_ltv as
-select
-  brand
-  , user_zip
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv
-  , avg(year2_ltv) as year2_ltv
-  , avg(year3_ltv) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where
-  is_pro = false
-  and user_zip is not null
-group by all
-having total_users > 50
-order by 1, 3 desc
-;
-
-drop table if exists adhoc.clubs_ltv;
-create table if not exists adhoc.clubs_ltv as
-select
-  brand
-  , if(club_name = '' or club_name = '<NA>' or upper(club_name) = 'N/A' or lower(club_name) = 'na' or club_name is null or club_name = 'none' or club_name = 'None', 'No-Club', club_name) as club_name
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv 
-  , avg(year2_ltv) as year2_ltv 
-  , avg(year3_ltv) as year3_ltv 
-from `gse-dw-prod.adhoc.user_ltv`
-where 
-  is_pro = false
-  and club_name is not null
-group by all
-having total_users > 50
-;
-
-drop table if exists adhoc.hear_about_us_ltv;
-create table if not exists adhoc.hear_about_us_ltv as
-select
-  brand
-  , if(hear_about_us = '' 
-    or hear_about_us = '<NA>' 
-    or upper(hear_about_us) = 'N/A' 
-    or lower(hear_about_us) = 'na' 
-    or hear_about_us is null 
-    or hear_about_us = 'none' 
-    or hear_about_us = 'None', 
-    'NA', hear_about_us) as hear_about_us
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv
-  , avg(year2_ltv) as year2_ltv
-  , avg(year3_ltv) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where is_pro = false
-group by all
-having total_users > 50
-;
-
-
-drop table if exists adhoc.brand_cohort_ltv;
-create table if not exists adhoc.brand_cohort_ltv as
-select
-  brand
-  , date_trunc(date(user_created_at), month) as user_created
-  , count(1) as total_users
-  , avg(day7_ltv) as day7_ltv
-  -- , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 8 day), 7, day7_ltv)) as day7_ltv
-  -- , avg(day30_ltv) as day30_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 30 day), null, day30_ltv)) as day30_ltv
-  -- , avg(day90_ltv) as day90_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 90 day), null, day90_ltv)) as day90_ltv
-  -- , avg(day120_ltv) as day120_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 120 day), null, day120_ltv)) as day120_ltv
-  -- , avg(year1_ltv) as year1_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 365 day), null, year1_ltv)) as year1_ltv
-  -- , avg(year2_ltv) as year2_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 730 day), null, year2_ltv)) as year2_ltv
-  -- , avg(year3_ltv) as year3_ltv
-  , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 1068 day), null, year3_ltv)) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where 
-  is_pro = false
-  and is_admin = false
-group by all
+-- drop table if exists adhoc.geo_ltv;
+-- create table if not exists adhoc.geo_ltv as
+-- select
+--   brand
+--   , user_geo
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv 
+--   , avg(year2_ltv) as year2_ltv 
+--   , avg(year3_ltv) as year3_ltv 
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where 
+--   is_pro = false
+--   and user_geo is not null
+-- group by all
 -- having total_users > 50
-;
+-- order by 1, 3 desc
+-- ;
+
+-- drop table if exists adhoc.state_ltv;
+-- create table if not exists adhoc.state_ltv as
+-- select
+--   brand
+--   , user_state
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv
+--   , avg(year2_ltv) as year2_ltv
+--   , avg(year3_ltv) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where
+--   is_pro = false
+--   and user_state is not null
+-- group by all
+-- having total_users > 50
+-- order by 1, 3 desc
+-- ;
+
+-- drop table if exists adhoc.zip_ltv;
+-- create table if not exists adhoc.zip_ltv as
+-- select
+--   brand
+--   , user_zip
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv
+--   , avg(year2_ltv) as year2_ltv
+--   , avg(year3_ltv) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where
+--   is_pro = false
+--   and user_zip is not null
+-- group by all
+-- having total_users > 50
+-- order by 1, 3 desc
+-- ;
+
+-- drop table if exists adhoc.clubs_ltv;
+-- create table if not exists adhoc.clubs_ltv as
+-- select
+--   brand
+--   , if(club_name = '' or club_name = '<NA>' or upper(club_name) = 'N/A' or lower(club_name) = 'na' or club_name is null or club_name = 'none' or club_name = 'None', 'No-Club', club_name) as club_name
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv 
+--   , avg(year2_ltv) as year2_ltv 
+--   , avg(year3_ltv) as year3_ltv 
+-- from `gse-dw-prod.adhoc.user_ltv`
+-- where 
+--   is_pro = false
+--   and club_name is not null
+-- group by all
+-- having total_users > 50
+-- ;
+
+-- drop table if exists adhoc.hear_about_us_ltv;
+-- create table if not exists adhoc.hear_about_us_ltv as
+-- select
+--   brand
+--   , if(hear_about_us = '' 
+--     or hear_about_us = '<NA>' 
+--     or upper(hear_about_us) = 'N/A' 
+--     or lower(hear_about_us) = 'na' 
+--     or hear_about_us is null 
+--     or hear_about_us = 'none' 
+--     or hear_about_us = 'None', 
+--     'NA', hear_about_us) as hear_about_us
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv
+--   , avg(year2_ltv) as year2_ltv
+--   , avg(year3_ltv) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where is_pro = false
+-- group by all
+-- having total_users > 50
+-- ;
 
 
-drop table if exists adhoc.registered_device_ltv;
-create table if not exists adhoc.registered_device_ltv as
-select
-  brand
-  , registered_device
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv
-  , avg(year2_ltv) as year2_ltv
-  , avg(year3_ltv) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where 
-  is_pro = false
-  and registered_device is not null
-group by all
-having total_users > 50
-order by 1, 2 desc
-;
+-- drop table if exists adhoc.brand_cohort_ltv;
+-- create table if not exists adhoc.brand_cohort_ltv as
+-- select
+--   brand
+--   , date_trunc(date(user_created_at), month) as user_created
+--   , count(1) as total_users
+--   , avg(day7_ltv) as day7_ltv
+--   -- , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 8 day), 7, day7_ltv)) as day7_ltv
+--   -- , avg(day30_ltv) as day30_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 30 day), null, day30_ltv)) as day30_ltv
+--   -- , avg(day90_ltv) as day90_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 90 day), null, day90_ltv)) as day90_ltv
+--   -- , avg(day120_ltv) as day120_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 120 day), null, day120_ltv)) as day120_ltv
+--   -- , avg(year1_ltv) as year1_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 365 day), null, year1_ltv)) as year1_ltv
+--   -- , avg(year2_ltv) as year2_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 730 day), null, year2_ltv)) as year2_ltv
+--   -- , avg(year3_ltv) as year3_ltv
+--   , avg(if(user_created_at >= timestamp_sub(current_timestamp(), interval 1068 day), null, year3_ltv)) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where 
+--   is_pro = false
+--   and is_admin = false
+-- group by all
+-- -- having total_users > 50
+-- ;
 
 
-drop table if exists adhoc.country_ltv;
-create table if not exists adhoc.country_ltv as
-select
-  brand
-  , if(country = 'US', 'United States', country) as country
-  , count(1) as total_users
-  , avg(day30_ltv) as day30_ltv
-  , avg(day90_ltv) as day90_ltv
-  , avg(day120_ltv) as day120_ltv
-  , avg(year1_ltv) as year1_ltv
-  , avg(year2_ltv) as year2_ltv
-  , avg(year3_ltv) as year3_ltv
-from `gse-dw-prod.adhoc.user_ltv` 
-where 
-  is_pro = false
-  and country is not null
-group by all
-having total_users > 50
-order by 1, 2 desc
-;
+-- drop table if exists adhoc.registered_device_ltv;
+-- create table if not exists adhoc.registered_device_ltv as
+-- select
+--   brand
+--   , registered_device
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv
+--   , avg(year2_ltv) as year2_ltv
+--   , avg(year3_ltv) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where 
+--   is_pro = false
+--   and registered_device is not null
+-- group by all
+-- having total_users > 50
+-- order by 1, 2 desc
+-- ;
+
+
+-- drop table if exists adhoc.country_ltv;
+-- create table if not exists adhoc.country_ltv as
+-- select
+--   brand
+--   , if(country = 'US', 'United States', country) as country
+--   , count(1) as total_users
+--   , avg(day30_ltv) as day30_ltv
+--   , avg(day90_ltv) as day90_ltv
+--   , avg(day120_ltv) as day120_ltv
+--   , avg(year1_ltv) as year1_ltv
+--   , avg(year2_ltv) as year2_ltv
+--   , avg(year3_ltv) as year3_ltv
+-- from `gse-dw-prod.adhoc.user_ltv` 
+-- where 
+--   is_pro = false
+--   and country is not null
+-- group by all
+-- having total_users > 50
+-- order by 1, 2 desc
+-- ;

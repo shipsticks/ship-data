@@ -158,7 +158,7 @@ select
   , a.utm_medium
   , a.utm_source
   , a.utm_campaign
-  , e.utm_term
+  , a.utm_term
   , a.landing_page
 from dp_staging.att_1 as s
 left outer join dp_staging.att_2 as a
@@ -178,7 +178,7 @@ select
   , b.utm_medium
   , b.utm_source
   , b.utm_campaign
-  , e.utm_term
+  , b.utm_term
   , b.landing_page
 from dp_staging.att_1 as a
 join dp_staging.att_3 as b
